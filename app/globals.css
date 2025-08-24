@@ -40,3 +40,24 @@ a {
     color-scheme: dark;
   }
 }
+
+.topic-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 260px;
+  height: 70px;
+  background: linear-gradient(to right, #d4fce0, #c8f0db);
+  cursor: pointer;
+}
+
+.topic-card:hover {
+  background: linear-gradient(to right, #58d68d, #05522e); /* màu sáng hơn */
+
+  color: #fff;
+}
