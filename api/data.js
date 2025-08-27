@@ -71,6 +71,7 @@ export async function getDataTopic() {
 export async function uploadFile(data) {
   const url = `${NEXT_PUBLIC_API_URL}/api/file/upload`;
   console.log("Call API:", url);
+  const token = Cookies.get("token");
 
   try {
     const formData = new FormData();
@@ -85,6 +86,7 @@ export async function uploadFile(data) {
       params: { tieuDe: data.tieuDe }, // query param
       headers: {
         "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -142,12 +144,40 @@ export async function downloadFile(id_file) {
   try {
     const res = await axios.get(url, {
       params: { id_file },
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
     });
 
     console.log("Download file thành công", res.data);
     return res.data;
   } catch (error) {
     console.log("Download file thất bại");
+    handleError(error);
+  }
+}
+
+export async function replaceFile(id_file, file) {
+  const url = `${NEXT_PUBLIC_API_URL}/api/file/replace`;
+  console.log("Call API:", url, "with id_file:", id_file);
+  const token = Cookies.get("token");
+
+  try {
+    const formData = new FormData();
+    formData.append("file", file); // truyền file
+
+    const res = await axios.post(url, formData, {
+      params: { id_file: id_file },
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log("Thay thế file thành công", res.data);
+    return res.data;
+  } catch (error) {
+    console.log("Thay thế file thất bại");
     handleError(error);
   }
 }

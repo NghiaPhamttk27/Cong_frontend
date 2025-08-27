@@ -65,7 +65,11 @@ export default function LoginPage() {
         <Typography variant="h5" align="center" gutterBottom>
           Đăng nhập
         </Typography>
-        <Box component="form" onSubmit={handleSubmit}>
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          autoComplete="off" // tắt autofill cho toàn form
+        >
           <TextField
             label="Tên đăng nhập"
             fullWidth
@@ -73,7 +77,11 @@ export default function LoginPage() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
+            InputLabelProps={{
+              shrink: true, // label luôn nổi
+            }}
           />
+
           <TextField
             label="Mật khẩu"
             type={showPassword ? "text" : "password"}
@@ -82,6 +90,9 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            InputLabelProps={{
+              shrink: true, // label luôn nổi
+            }}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">

@@ -22,6 +22,7 @@ import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
 import { Button } from "@mui/material";
 import Link from "next/link";
+import Cookies from "js-cookie";
 
 const drawerWidth = 240;
 
@@ -76,9 +77,19 @@ export default function Layout({ children }) {
   const handleDrawerOpen = () => setOpen(true);
   const handleDrawerClose = () => setOpen(false);
 
+  const handleLogout = () => {
+    // Xóa cookie
+    Cookies.remove("token", { path: "/" });
+    Cookies.remove("role", { path: "/" });
+
+    // Điều hướng về trang homepage
+    window.location.href = "/admin/login"; // luôn an toàn
+  };
+
   const menuItems = [
     { text: "Quản trị Chủ đề", link: "/admin/dashboard" },
     { text: "Quản trị Tổ chức", link: "/admin/dashboard/tochuc" },
+    { text: "Quản trị File", link: "/admin/dashboard/file" },
     { text: "Quản trị Người dùng", link: "/admin/dashboard/users" },
   ];
 
@@ -134,7 +145,12 @@ export default function Layout({ children }) {
             </ListItem>
           ))}
         </List>
-        <Button variant="contained" color="error" style={{ margin: 15 }}>
+        <Button
+          variant="contained"
+          color="error"
+          style={{ margin: 15 }}
+          onClick={handleLogout}
+        >
           Đăng xuất
         </Button>
       </Drawer>
