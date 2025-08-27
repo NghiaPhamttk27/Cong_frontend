@@ -2,19 +2,18 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie"; // <-- import js-cookie
 import { login } from "@/api/auth";
 import { Box, Button, Typography, Paper } from "@mui/material";
-import images from "@/asset/images";
 import { TextField, IconButton, InputAdornment } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { cookies } from "next/headers";
+import images from "@/asset/images";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-
   const [showPassword, setShowPassword] = useState(false);
 
   const handleClickShowPassword = () => setShowPassword((prev) => !prev);
@@ -26,20 +25,9 @@ export default function LoginPage() {
     try {
       const data = await login(username, password);
 
-      // Lưu cookie trong server
-      cookies().set("token", data.access_token, {
-        path: "/", // cookie áp dụng toàn site
-        httpOnly: true, // an toàn hơn, JS client không đọc được
-        secure: true, // chỉ gửi qua HTTPS
-        maxAge: 60 * 60 * 24 * 14, // 14 ngày
-      });
-
-      cookies().set("role", data.roles, {
-        path: "/",
-        httpOnly: true,
-        secure: true,
-        maxAge: 60 * 60 * 24 * 14,
-      });
+      // Lưu cookie phía client với js-cookie
+      Cookies.set("token", data.access_token, { expires: 14, path: "/" });
+      Cookies.set("role", data.roles, { expires: 14, path: "/" });
 
       // Điều hướng
       if (data.roles === "Admin") {

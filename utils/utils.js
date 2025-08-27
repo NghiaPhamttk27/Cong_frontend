@@ -1,5 +1,22 @@
 // utils/fileUtils.js
 
+export const formatColorsFileType = (fileType) => {
+  if (!fileType) return "#9e9e9e"; // default grey
+
+  switch (fileType.toUpperCase()) {
+    case "DOC":
+      return "#2196f3"; // xanh dương (Word)
+    case "XLS":
+      return "#4caf50"; // xanh lá (Excel)
+    case "PPT":
+      return "#ff9800"; // cam (PowerPoint)
+    case "PDF":
+      return "#f44336"; // đỏ (PDF)
+    default:
+      return "#9e9e9e"; // xám (UNKNOWN)
+  }
+};
+
 export const getFileType = (fileName) => {
   if (!fileName) return null;
 
@@ -32,4 +49,8 @@ export const formatDate = (dateString) => {
   const year = date.getFullYear();
 
   return `${day}/${month}/${year}`;
+};
+
+export const formatLink = (link) => {
+  return `https://view.officeapps.live.com/op/view.aspx?src=${link}`;
 };

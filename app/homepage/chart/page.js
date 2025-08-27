@@ -11,12 +11,6 @@ import {
 } from "recharts";
 import { getDataToChuc, getDataTopic } from "@/api/data";
 
-const data = [
-  { name: "Sở Khoa học và Công nghệ", value: 2, color: "#90EE90" },
-  { name: "Sở Văn hóa, Thể thao và Du lịch", value: 2, color: "#90EE90" },
-  { name: "Sở Y tế", value: 1, color: "#90EE90" },
-];
-
 export default function ChartComponent() {
   const [dataTochuc, setDataTochuc] = useState([]);
   const [dataTopic, setDataTopic] = useState([]);
@@ -55,7 +49,7 @@ export default function ChartComponent() {
       {/* Biểu đồ theo tổ chức */}
       <div
         style={{
-          width: 630,
+          width: 1100,
           height: 500,
           borderRadius: "8px",
           border: "1px solid #e0e0e0",
@@ -138,7 +132,7 @@ export default function ChartComponent() {
       {/* Biểu đồ theo chủ đề */}
       <div
         style={{
-          width: 630,
+          width: 1100,
           height: 500,
           borderRadius: "8px",
           border: "1px solid #e0e0e0",

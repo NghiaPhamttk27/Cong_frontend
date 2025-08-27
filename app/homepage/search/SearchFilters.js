@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Accordion,
   AccordionSummary,
@@ -10,178 +10,212 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 
-// Dữ liệu giả định
-const filterData = [
-  {
-    title: "Chủ đề",
-    paramKey: "topic",
-    items: [
-      { label: "Công nghệ thông tin - Truyền thông", value: "cntt", count: 2 },
-      { label: "Giáo dục", value: "giaoduc", count: 5 },
-      { label: "Y tế, Sức khỏe", value: "yte", count: 3 },
-    ],
-  },
-  {
-    title: "Tổ chức",
-    paramKey: "organization",
-    items: [
-      {
-        label: "Sở Khoa học và Công nghệ",
-        value: "so-khcn",
-        count: 5,
-        divisions: [
-          {
-            label: "Phòng Khoa học và Công nghệ",
-            value: "so-khcn-phong-khcn",
-            count: 2,
-          },
-          {
-            label: "Phòng Công nghệ thông tin",
-            value: "so-khcn-phong-cntt",
-            count: 3,
-          },
-        ],
-      },
-      {
-        label: "Sở Y tế",
-        value: "so-yte",
-        count: 3,
-        divisions: [
-          {
-            label: "Phòng Y tế dự phòng",
-            value: "so-yte-yte-du-phong",
-            count: 1,
-          },
-          {
-            label: "Phòng Kế hoạch tổng hợp",
-            value: "so-yte-ke-hoach-th",
-            count: 2,
-          },
-        ],
-      },
-      { label: "Sở Giáo dục và Đào tạo", value: "so-gddt", count: 1 },
-    ],
-  },
-];
+import { getListTopics } from "@/api/topic";
+import { getListTochuc, getListPhongBan } from "@/api/tochuc";
 
 export default function SearchFilters({ filters, setFilters }) {
-  // Style cho mục đang được chọn
+  const [chuDes, setChuDes] = useState([]);
+  const [tochucs, setTochucs] = useState([]);
+  const [phongbans, setPhongbans] = useState({});
+
+  // style
   const selectedStyle = {
-    backgroundColor: "#f0faf7", // Màu xanh nhạt
+    backgroundColor: "#f0faf7",
     color: "#3c826bff",
   };
 
-  // Style cho dòng Sở
-  const soItemStyle = {};
+  // fetch Chủ đề
+  const fetchTopics = async () => {
+    try {
+      const data = await getListTopics();
+      setChuDes(data || []);
+    } catch (err) {
+      console.error("Lỗi khi lấy chủ đề:", err);
+    }
+  };
+
+  // fetch tổ chức
+  const fetchTochucs = async () => {
+    try {
+      const data = await getListTochuc();
+      setTochucs(data || []);
+    } catch (err) {
+      console.error("Lỗi khi lấy tổ chức:", err);
+    }
+  };
+
+  // fetch phòng ban của từng tổ chức
+  const fetchPhongbans = async (tochucId) => {
+    if (phongbans[tochucId]) return; // tránh gọi lại nhiều lần
+    try {
+      const data = await getListPhongBan(tochucId);
+      setPhongbans((prev) => ({ ...prev, [tochucId]: data || [] }));
+    } catch (err) {
+      console.error("Lỗi khi lấy phòng ban:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchTopics();
+    fetchTochucs();
+  }, []);
 
   return (
     <div>
-      {filterData.map((category) => (
-        <Accordion
-          key={category.paramKey}
+      {/* Chủ đề */}
+      <Accordion
+        sx={{
+          "&.Mui-expanded": { margin: "0 !important" },
+          width: "100%",
+        }}
+        defaultExpanded
+      >
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon sx={{ color: "white" }} />}
           sx={{
-            "&.Mui-expanded": { margin: "0 !important" },
-            width: "100%",
+            background: "#1b873f",
+            color: "white",
+            height: "40px !important",
+            minHeight: "40px !important",
           }}
         >
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon sx={{ color: "white" }} />}
-            sx={{
-              background: "#1b873f",
-              color: "white",
-              height: "40px !important",
-              minHeight: "40px !important",
-            }}
-          >
-            <Typography>{category.title}</Typography>
-          </AccordionSummary>
-          <AccordionDetails sx={{ padding: 0 }}>
-            {category.items.map((item) => {
-              // Kiểm tra xem mục này (hoặc Sở chứa nó) có đang được chọn không
-              const isSelected =
-                filters[category.paramKey] === item.value ||
-                (item.divisions &&
-                  filters[category.paramKey]?.startsWith(item.value));
+          <Typography>Chủ đề</Typography>
+        </AccordionSummary>
+        <AccordionDetails sx={{ padding: 0 }}>
+          {chuDes.map((cd) => {
+            const isSelected = filters.ChuDeIds.includes(cd.Id_chu_de);
 
-              return (
-                <div key={item.value}>
-                  {/* Dòng chính cho Sở hoặc Chủ đề */}
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      padding: "8px 10px", // Thêm padding ngang
-                      cursor: "pointer",
-                      fontWeight: 600,
-                      borderBottom: "1px solid #c4c4c4",
-                      ...soItemStyle,
-                      ...(isSelected ? selectedStyle : {}),
-                    }}
-                    onClick={() =>
-                      setFilters({
-                        ...filters,
-                        [category.paramKey]: item.value,
-                      })
-                    }
-                  >
-                    <Typography>{item.label}</Typography>
-                    <Chip label={item.count} size="small" />
-                  </div>
-                  {/* Nếu có phòng ban, render lồng vào bên trong */}
-                  {item.divisions && (
+            return (
+              <div
+                key={cd.Id_chu_de}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: "8px 10px",
+                  cursor: "pointer",
+                  borderBottom: "1px solid #c4c4c4",
+                  ...(isSelected ? selectedStyle : {}),
+                }}
+                onClick={() =>
+                  setFilters({ ...filters, ChuDeIds: [cd.Id_chu_de] })
+                }
+              >
+                <Typography>{cd.TenChuDe}</Typography>
+                <Chip label={cd.SoLuongFile_So || 0} size="small" />
+              </div>
+            );
+          })}
+        </AccordionDetails>
+      </Accordion>
+
+      {/* Tổ chức + phòng ban */}
+      <Accordion
+        sx={{
+          "&.Mui-expanded": { margin: "0 !important" },
+          width: "100%",
+        }}
+        defaultExpanded
+      >
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon sx={{ color: "white" }} />}
+          sx={{
+            background: "#1b873f",
+            color: "white",
+            height: "40px !important",
+            minHeight: "40px !important",
+          }}
+        >
+          <Typography>Tổ chức</Typography>
+        </AccordionSummary>
+        <AccordionDetails sx={{ padding: 0 }}>
+          {tochucs.map((tochuc) => {
+            const isSelected = filters.SoBanNganhIds.includes(
+              tochuc.Id_so_ban_nganh
+            );
+
+            return (
+              <div key={tochuc.Id_so_ban_nganh}>
+                {/* dòng chính tổ chức */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: "8px 10px",
+                    cursor: "pointer",
+                    fontWeight: 600,
+                    borderBottom: "1px solid #c4c4c4",
+                    ...(isSelected ? selectedStyle : {}),
+                  }}
+                  onClick={() => {
+                    setFilters({
+                      ...filters,
+                      SoBanNganhIds: [tochuc.Id_so_ban_nganh],
+                      PhongBanIds: [], // reset khi chọn lại sở
+                    });
+                    fetchPhongbans(tochuc.Id_so_ban_nganh);
+                  }}
+                >
+                  <Typography>{tochuc.TenSoBanNganh}</Typography>
+                  <Chip label={tochuc.SoLuongFile_So || 0} size="small" />
+                </div>
+
+                {/* phòng ban */}
+                {phongbans[tochuc.Id_so_ban_nganh] &&
+                  phongbans[tochuc.Id_so_ban_nganh].length > 0 && (
                     <div style={{ borderBottom: "1px solid #c4c4c4" }}>
-                      {item.divisions.map((division) => {
-                        const isDivisionSelected =
-                          filters[category.paramKey] === division.value;
+                      {phongbans[tochuc.Id_so_ban_nganh].map((pb) => {
+                        const isDivisionSelected = filters.PhongBanIds.includes(
+                          pb.Id_phong_ban
+                        );
 
                         return (
                           <div
-                            key={division.value}
+                            key={pb.Id_phong_ban}
                             style={{
                               display: "flex",
                               justifyContent: "space-between",
                               alignItems: "center",
                               padding: "8px 10px",
                               paddingLeft: "20px",
-
                               cursor: "pointer",
-
                               ...(isDivisionSelected ? selectedStyle : {}),
                             }}
                             onClick={() =>
                               setFilters({
                                 ...filters,
-
-                                [category.paramKey]: division.value,
+                                SoBanNganhIds: [tochuc.Id_so_ban_nganh],
+                                PhongBanIds: [pb.Id_phong_ban],
                               })
                             }
                           >
-                            {/* Vấn đề được sửa ở đây: icon và text giờ là con trực tiếp của flexbox */}
                             <div
-                              style={{ display: "flex", alignItems: "center" }}
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                              }}
                             >
                               <FiberManualRecordIcon
                                 sx={{
                                   fontSize: 12,
                                   marginRight: 1,
                                   color: "inherit",
-                                }} // color inherit để kế thừa màu từ style cha
+                                }}
                               />
-                              <Typography>{division.label}</Typography>
+                              <Typography>{pb.TenPhongBan}</Typography>
                             </div>
-                            <Chip label={division.count} size="small" />
+                            <Chip label={pb.SoLuongFile_So || 0} size="small" />
                           </div>
                         );
                       })}
                     </div>
                   )}
-                </div>
-              );
-            })}
-          </AccordionDetails>
-        </Accordion>
-      ))}
+              </div>
+            );
+          })}
+        </AccordionDetails>
+      </Accordion>
     </div>
   );
 }

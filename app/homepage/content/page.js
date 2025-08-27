@@ -4,26 +4,31 @@ import React from "react";
 import Topic from "../topic/page";
 import ChartComponent from "../chart/page";
 import DataList from "../data/page";
+import SearchComponent from "@/components/searchComponent";
 
 function Content() {
   return (
     <div
       style={{
         width: "100%",
-        padding: "20px 300px",
+        padding: "20px 10vw",
         display: "flex",
         justifyContent: "center",
         display: "flex",
         flexDirection: "column",
       }}
     >
-      <div style={{ width: "1300px", marginBottom: 0, padding: "50px 0" }}>
+      <div style={{ marginBottom: 0, padding: "50px 0" }}>
+        <SearchComponent />
+      </div>
+      <div style={{ marginBottom: 0, padding: "50px 0" }}>
         <DataList />
       </div>
-      <div style={{ width: "1300px", marginBottom: 100 }}>
+
+      <div style={{ marginBottom: 100 }}>
         <Topic />
       </div>
-      <div style={{ width: "1300px" }}>
+      <div style={{}}>
         <ChartComponent />
       </div>
     </div>

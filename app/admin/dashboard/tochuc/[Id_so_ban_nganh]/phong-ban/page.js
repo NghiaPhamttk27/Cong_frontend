@@ -21,16 +21,16 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { formatDate } from "@/utils/utils";
 import {
-  getListTochuc,
-  createTochuc,
-  updateTochuc,
-  deleteTochuc,
+  getListPhongBan,
+  createPhongban,
+  updatePhongban,
+  deletePhongban,
 } from "@/api/tochuc";
-import Link from "next/link";
 import CustomModal from "@/components/customModal";
 
-export default function Tochuc() {
-  const [dataTochuc, setDataTochuc] = useState([]);
+export default function Phongban({ params }) {
+  const Id_so_ban_nganh = React.use(params).Id_so_ban_nganh; // unwrap params
+  const [dataPhongban, setDataPhongban] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState([]);
 
@@ -38,9 +38,9 @@ export default function Tochuc() {
   const [openModalCreate, setOpenModalCreate] = useState(false);
   const [openModalUpdate, setOpenModalUpdate] = useState(false);
   const [openModalDelete, setOpenModalDelete] = useState(false);
-  const [tenTochuc, setTenTochuc] = useState("");
+  const [tenPhongban, setTenPhongban] = useState("");
   const [moTa, setMoTa] = useState("");
-  const [idTochuc, setIdTochuc] = useState("");
+  const [idPhongban, setIdPhongban] = useState("");
 
   // Alert state
   const [open, setOpen] = useState(false);
@@ -48,64 +48,64 @@ export default function Tochuc() {
   const [message, setMessage] = useState("");
 
   // --- Fetch danh sách ---
-  const fetchTochucs = async () => {
+  const fetchPhongbans = async () => {
     setLoading(true);
     try {
-      const data = await getListTochuc();
-      setDataTochuc(data);
+      const data = await getListPhongBan(Id_so_ban_nganh);
+      setDataPhongban(data);
     } catch (err) {
-      console.error("Lỗi khi lấy tochucs:", err);
+      console.error("Lỗi khi lấy phòng ban:", err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchTochucs();
-  }, []);
+    fetchPhongbans();
+  }, [Id_so_ban_nganh]);
 
   // --- CRUD API ---
-  const handleAddTochuc = async (ten, moTa) => {
+  const handleAddPhongban = async (ten, moTa) => {
     try {
-      await createTochuc({ TenSoBanNganh: ten, MoTa: moTa });
+      await createPhongban(Id_so_ban_nganh, { TenPhongBan: ten, MoTa: moTa });
       setAlertType("success");
-      setMessage("Tạo tổ chức thành công!");
+      setMessage("Tạo phòng ban thành công!");
       setOpen(true);
       setOpenModalCreate(false);
-      fetchTochucs();
+      fetchPhongbans();
     } catch (error) {
       setAlertType("error");
-      setMessage(error.message || "Tạo tổ chức thất bại!");
+      setMessage(error.message || "Tạo phòng ban thất bại!");
       setOpen(true);
     }
   };
 
-  const handleUpdateTochuc = async (ten, moTa) => {
+  const handleUpdatePhongban = async (ten, moTa) => {
     try {
-      await updateTochuc(idTochuc, { TenSoBanNganh: ten, MoTa: moTa });
+      await updatePhongban(idPhongban, { TenPhongBan: ten, MoTa: moTa });
       setAlertType("success");
-      setMessage("Cập nhật tổ chức thành công!");
+      setMessage("Cập nhật phòng ban thành công!");
       setOpen(true);
       setOpenModalUpdate(false);
-      fetchTochucs();
+      fetchPhongbans();
     } catch (error) {
       setAlertType("error");
-      setMessage(error.message || "Cập nhật tổ chức thất bại!");
+      setMessage(error.message || "Cập nhật phòng ban thất bại!");
       setOpen(true);
     }
   };
 
-  const handleDeleteTochuc = async () => {
+  const handleDeletePhongban = async () => {
     try {
-      await deleteTochuc(idTochuc);
+      await deletePhongban(idPhongban);
       setAlertType("success");
-      setMessage("Xóa tổ chức thành công!");
+      setMessage("Xóa phòng ban thành công!");
       setOpen(true);
       setOpenModalDelete(false);
-      fetchTochucs();
+      fetchPhongbans();
     } catch (error) {
       setAlertType("error");
-      setMessage(error.message || "Xóa tổ chức thất bại!");
+      setMessage(error.message || "Xóa phòng ban thất bại!");
       setOpen(true);
     }
   };
@@ -113,20 +113,20 @@ export default function Tochuc() {
   // --- Modal open functions ---
   const openCreateModal = () => {
     setOpenModalCreate(true);
-    setTenTochuc("");
+    setTenPhongban("");
     setMoTa("");
-    setIdTochuc("");
+    setIdPhongban("");
   };
 
-  const openUpdateModal = (tochuc) => {
-    setIdTochuc(tochuc.Id_so_ban_nganh);
-    setTenTochuc(tochuc.TenSoBanNganh);
-    setMoTa(tochuc.MoTa);
+  const openUpdateModal = (phongban) => {
+    setIdPhongban(phongban.Id_phong_ban);
+    setTenPhongban(phongban.TenPhongBan);
+    setMoTa(phongban.MoTa);
     setOpenModalUpdate(true);
   };
 
   const openDeleteModal = (id) => {
-    setIdTochuc(id);
+    setIdPhongban(id);
     setOpenModalDelete(true);
   };
 
@@ -138,20 +138,20 @@ export default function Tochuc() {
   };
   const isSelected = (id) => selected.includes(id);
 
-  const handleBulkDelete = async () => {
-    try {
-      await Promise.all(selected.map((id) => deleteTochuc(id)));
-      setAlertType("success");
-      setMessage("Xóa thành công!");
-      setOpen(true);
-      setSelected([]);
-      fetchTochucs();
-    } catch (error) {
-      setAlertType("error");
-      setMessage("Xóa thất bại!");
-      setOpen(true);
-    }
-  };
+  // const handleBulkDelete = async () => {
+  //   try {
+  //     await Promise.all(selected.map((id) => deletePhongban(id)));
+  //     setAlertType("success");
+  //     setMessage("Xóa thành công!");
+  //     setOpen(true);
+  //     setSelected([]);
+  //     fetchPhongbans();
+  //   } catch (error) {
+  //     setAlertType("error");
+  //     setMessage("Xóa thất bại!");
+  //     setOpen(true);
+  //   }
+  // };
 
   if (loading) return <p>Đang tải...</p>;
 
@@ -164,7 +164,7 @@ export default function Tochuc() {
           onClick={openCreateModal}
           sx={{ marginBottom: 2 }}
         >
-          Thêm Tổ Chức
+          Thêm Phòng Ban
         </Button>
 
         <Snackbar
@@ -197,51 +197,41 @@ export default function Tochuc() {
             <TableRow>
               <TableCell />
               <TableCell>STT</TableCell>
-              <TableCell>Tên Tổ chức</TableCell>
+              <TableCell>Tên Phòng Ban</TableCell>
               <TableCell>Mô Tả</TableCell>
               <TableCell>Ngày Tạo</TableCell>
-              <TableCell>Phòng ban</TableCell>
               <TableCell>Hành động</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {dataTochuc.map((tochuc, index) => (
+            {dataPhongban.map((phongban, index) => (
               <TableRow
-                key={tochuc.Id_so_ban_nganh || index}
+                key={phongban.Id_phong_ban || index}
                 hover
-                onClick={() => toggleRow(tochuc.Id_so_ban_nganh)}
-                selected={isSelected(tochuc.Id_so_ban_nganh)}
+                onClick={() => toggleRow(phongban.Id_phong_ban)}
+                selected={isSelected(phongban.Id_phong_ban)}
                 sx={{ cursor: "pointer" }}
               >
                 <TableCell padding="checkbox">
-                  <Checkbox checked={isSelected(tochuc.Id_so_ban_nganh)} />
+                  <Checkbox checked={isSelected(phongban.Id_phong_ban)} />
                 </TableCell>
                 <TableCell>{index + 1}</TableCell>
-                <TableCell>{tochuc.TenSoBanNganh}</TableCell>
-                <TableCell>{tochuc.MoTa}</TableCell>
-                <TableCell>{formatDate(tochuc.NgayTao)}</TableCell>
-                <TableCell onClick={(e) => e.stopPropagation()}>
-                  <Button
-                    component={Link}
-                    href={`/admin/dashboard/tochuc/${tochuc.Id_so_ban_nganh}/phong-ban/`}
-                    variant="contained"
-                    color="success"
-                  >
-                    Xem
-                  </Button>
-                </TableCell>
+                <TableCell>{phongban.TenPhongBan}</TableCell>
+                <TableCell>{phongban.MoTa}</TableCell>
+                <TableCell>{formatDate(phongban.NgayTao)}</TableCell>
+
                 <TableCell onClick={(e) => e.stopPropagation()}>
                   <IconButton
                     color="primary"
                     size="small"
-                    onClick={() => openUpdateModal(tochuc)}
+                    onClick={() => openUpdateModal(phongban)}
                   >
                     <EditIcon />
                   </IconButton>
                   <IconButton
                     color="error"
                     size="small"
-                    onClick={() => openDeleteModal(tochuc.Id_so_ban_nganh)}
+                    onClick={() => openDeleteModal(phongban.Id_phong_ban)}
                   >
                     <DeleteIcon />
                   </IconButton>
@@ -257,13 +247,13 @@ export default function Tochuc() {
         open={openModalCreate}
         onClose={() => setOpenModalCreate(false)}
         type="form"
-        title="Thêm tổ chức"
+        title="Thêm Phòng Ban"
         content={
           <Box display="flex" flexDirection="column" gap={2}>
             <TextField
-              label="Tên Tổ Chức"
-              value={tenTochuc}
-              onChange={(e) => setTenTochuc(e.target.value)}
+              label="Tên Phòng Ban"
+              value={tenPhongban}
+              onChange={(e) => setTenPhongban(e.target.value)}
               fullWidth
             />
             <TextField
@@ -280,7 +270,7 @@ export default function Tochuc() {
           <Button
             variant="contained"
             color="warning"
-            onClick={() => handleAddTochuc(tenTochuc, moTa)}
+            onClick={() => handleAddPhongban(tenPhongban, moTa)}
           >
             Đồng ý
           </Button>
@@ -291,13 +281,13 @@ export default function Tochuc() {
         open={openModalUpdate}
         onClose={() => setOpenModalUpdate(false)}
         type="form"
-        title="Sửa tổ chức"
+        title="Sửa Phòng Ban"
         content={
           <Box display="flex" flexDirection="column" gap={2}>
             <TextField
-              label="Tên Tổ Chức"
-              value={tenTochuc}
-              onChange={(e) => setTenTochuc(e.target.value)}
+              label="Tên Phòng"
+              value={tenPhongban}
+              onChange={(e) => setTenPhongban(e.target.value)}
               fullWidth
             />
             <TextField
@@ -314,7 +304,7 @@ export default function Tochuc() {
           <Button
             variant="contained"
             color="warning"
-            onClick={() => handleUpdateTochuc(tenTochuc, moTa)}
+            onClick={() => handleUpdatePhongban(tenPhongban, moTa)}
           >
             Đồng ý
           </Button>
@@ -325,11 +315,11 @@ export default function Tochuc() {
         open={openModalDelete}
         onClose={() => setOpenModalDelete(false)}
         type="error"
-        title="Xóa tổ chức"
+        title="Xóa Phòng Ban"
         content={
           <Box display="flex" flexDirection="column" gap={2}>
             <Typography>
-              Bạn có chắc chắn muốn xóa tổ chức này không?
+              Bạn có chắc chắn muốn xóa phòng ban này không?
             </Typography>
           </Box>
         }
@@ -337,7 +327,7 @@ export default function Tochuc() {
           <Button
             variant="contained"
             color="error"
-            onClick={handleDeleteTochuc}
+            onClick={handleDeletePhongban}
           >
             Xóa
           </Button>

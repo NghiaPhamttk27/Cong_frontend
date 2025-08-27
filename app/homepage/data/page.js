@@ -2,75 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { getLatesFile, getMostViewFile } from "@/api/data";
 import { getFileType, formatDate } from "@/utils/utils";
-
-// Dữ liệu giả (fake data)
-const latestData = [
-  {
-    category: "Công nghệ thông tin - Truyền thông",
-    title: "Cơ sở dữ liệu về trạm thu phát sóng",
-    format: "JSON",
-    date: "07/03/2025",
-  },
-  {
-    category: "Y tế, Sức khỏe",
-    title: "Danh sách cơ sở dữ liệu kiểm tiêm chủng tại Yên Bái",
-    format: "XLSX",
-    date: "29/07/2024",
-  },
-  {
-    category: "Công nghệ thông tin - Truyền thông",
-    title:
-      "Danh mục các nhiệm vụ khoa học công nghệ trên địa bàn tỉnh Yên Bái năm 2024",
-    format: "PDF",
-    date: "29/07/2024",
-  },
-  {
-    category: "Văn hóa - Du lịch",
-    title: "Cơ sở nhà hàng, quán ăn tại Yên Bái",
-    format: "XLS",
-    date: "29/07/2024",
-  },
-  {
-    category: "Văn hóa - Du lịch",
-    title: "Cơ sở dữ liệu lưu trú",
-    format: "XLS",
-    date: "29/07/2024",
-  },
-];
-
-const mostViewedData = [
-  {
-    category: "Công nghệ thông tin - Truyền thông",
-    title: "Cơ sở dữ liệu về trạm thu phát sóng",
-    format: "JSON",
-    date: "07/03/2025",
-  },
-  {
-    category: "Công nghệ thông tin - Truyền thông",
-    title:
-      "Danh mục các nhiệm vụ khoa học công nghệ trên địa bàn tỉnh Yên Bái năm 2024",
-    format: "PDF",
-    date: "29/07/2024",
-  },
-  {
-    category: "Văn hóa - Du lịch",
-    title: "Cơ sở nhà hàng, quán ăn tại Yên Bái",
-    format: "XLS",
-    date: "29/07/2024",
-  },
-  {
-    category: "Văn hóa - Du lịch",
-    title: "Cơ sở dữ liệu lưu trú",
-    format: "XLS",
-    date: "29/07/2024",
-  },
-  {
-    category: "Y tế, Sức khỏe",
-    title: "Danh sách cơ sở dữ liệu kiểm tiêm chủng tại Yên Bái",
-    format: "XLSX",
-    date: "29/07/2024",
-  },
-];
+import { Link } from "@mui/material";
 
 // Định nghĩa các đối tượng style
 const mainContainerStyle = {
@@ -102,8 +34,9 @@ const sectionHeaderStyle = {
 
 const sectionTitleStyle = {
   margin: 0,
-  fontSize: "1.25rem",
+  fontSize: "22px",
   color: "#056d4f",
+  padding: "17px 0",
 };
 
 const dataListStyle = {
@@ -131,7 +64,7 @@ const itemCategoryStyle = {
 
 const itemTitleStyle = {
   color: "#333",
-  fontSize: "1.1rem",
+  fontSize: "16px",
   fontWeight: "600",
   margin: "5px 0",
 };
@@ -186,10 +119,36 @@ const DataSection = ({ title, data }) => (
           backgroundColor:
             formatColors[getFileType(item.LoaiFile).toLowerCase()] || "#ccc",
         };
+
         return (
           <div key={index} style={{ ...dataItemStyle, ...itemSpecificStyle }}>
-            <p style={itemCategoryStyle}>{item.ChuDe.TenChuDe}</p>
-            <h4 style={itemTitleStyle}>{item.TieuDe}</h4>
+            {/* Chủ đề → search theo topic id */}
+            <Link
+              href={`/homepage/search?topic=${item.ChuDe.Id_chu_de}`}
+              style={{ textDecoration: "none" }}
+            >
+              <p style={{ ...itemCategoryStyle, cursor: "pointer" }}>
+                {item.ChuDe.TenChuDe}
+              </p>
+            </Link>
+
+            {/* Tiêu đề → search theo keyword */}
+            <Link
+              href={`/homepage/search?keyword=${encodeURIComponent(
+                item.TieuDe
+              )}`}
+              style={{ textDecoration: "none", color: "#2b2b2bff" }}
+            >
+              <h4
+                style={{
+                  ...itemTitleStyle,
+                  cursor: "pointer",
+                }}
+              >
+                {item.TieuDe}
+              </h4>
+            </Link>
+
             <div style={itemMetaStyle}>
               <span style={formatStyle}>{getFileType(item.LoaiFile)}</span>
               <span style={itemDateStyle}>
