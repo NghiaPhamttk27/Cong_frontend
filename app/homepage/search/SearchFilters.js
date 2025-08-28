@@ -102,7 +102,7 @@ export default function SearchFilters({ filters, setFilters }) {
                 }
               >
                 <Typography>{cd.TenChuDe}</Typography>
-                <Chip label={cd.SoLuongFile_So || 0} size="small" />
+                <Chip label={cd.SoLuongFile_ChuDe || 0} size="small" />
               </div>
             );
           })}
@@ -205,7 +205,10 @@ export default function SearchFilters({ filters, setFilters }) {
                               />
                               <Typography>{pb.TenPhongBan}</Typography>
                             </div>
-                            <Chip label={pb.SoLuongFile_So || 0} size="small" />
+                            <Chip
+                              label={pb.SoLuongFile_PhongBan || 0}
+                              size="small"
+                            />
                           </div>
                         );
                       })}

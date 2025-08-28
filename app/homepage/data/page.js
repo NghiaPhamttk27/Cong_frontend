@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { getLatesFile, getMostViewFile } from "@/api/data";
 import { getFileType, formatDate } from "@/utils/utils";
 import { Link } from "@mui/material";
+import { formatColorsFileType } from "@/utils/utils";
 
 // Định nghĩa các đối tượng style
 const mainContainerStyle = {
@@ -86,15 +87,6 @@ const itemFormatBaseStyle = {
   color: "#fff",
 };
 
-// Map các kiểu format với màu nền tương ứng
-const formatColors = {
-  json: "#f9d949",
-  xlsx: "#21a366",
-  xls: "#21a366",
-  pdf: "#e25858",
-  doc: "#204c9fff",
-};
-
 const itemDateStyle = {
   display: "flex",
   alignItems: "center",
@@ -116,8 +108,7 @@ const DataSection = ({ title, data }) => (
           index === data.length - 1 ? lastChildStyle : {};
         const formatStyle = {
           ...itemFormatBaseStyle,
-          backgroundColor:
-            formatColors[getFileType(item.LoaiFile).toLowerCase()] || "#ccc",
+          backgroundColor: formatColorsFileType(getFileType(item.FileUrl)),
         };
 
         return (
@@ -150,7 +141,7 @@ const DataSection = ({ title, data }) => (
             </Link>
 
             <div style={itemMetaStyle}>
-              <span style={formatStyle}>{getFileType(item.LoaiFile)}</span>
+              <span style={formatStyle}>{getFileType(item.FileUrl)}</span>
               <span style={itemDateStyle}>
                 <span style={calendarIconStyle}>🗓️</span>
                 {formatDate(item.NgayTao)}

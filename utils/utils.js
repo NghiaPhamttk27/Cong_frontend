@@ -5,13 +5,13 @@ export const formatColorsFileType = (fileType) => {
 
   switch (fileType.toUpperCase()) {
     case "DOC":
-      return "#2196f3"; // xanh dương (Word)
+      return "#112d89ff"; // xanh dương (Word)
     case "XLS":
-      return "#4caf50"; // xanh lá (Excel)
+      return "#228225ff"; // xanh lá (Excel)
     case "PPT":
-      return "#ff9800"; // cam (PowerPoint)
+      return "#a6690dff"; // cam (PowerPoint)
     case "PDF":
-      return "#f44336"; // đỏ (PDF)
+      return "#9b1d14ff"; // đỏ (PDF)
     default:
       return "#9e9e9e"; // xám (UNKNOWN)
   }

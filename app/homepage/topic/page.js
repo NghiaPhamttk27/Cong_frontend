@@ -44,9 +44,9 @@ export default function Topic() {
 
       <div
         style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "25px",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+          gap: "15px", // có thể chỉnh nhỏ lại
         }}
       >
         {dataTopics.map((topic) => (
@@ -66,9 +66,9 @@ export default function Topic() {
 
       <div
         style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "25px",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+          gap: "15px", // có thể chỉnh nhỏ lại
         }}
       >
         {dataTochuc.map((tochuc) => (

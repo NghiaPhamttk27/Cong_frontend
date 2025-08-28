@@ -32,9 +32,9 @@ const Header = () => {
       </Link>
 
       {/* Button */}
-      <Button variant="contained" color="primary">
+      {/* <Button variant="contained" color="primary">
         Đăng nhập
-      </Button>
+      </Button> */}
     </div>
   );
 };

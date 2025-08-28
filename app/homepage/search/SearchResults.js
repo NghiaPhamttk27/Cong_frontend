@@ -46,28 +46,28 @@ export default function SearchResults({
         }}
       />
 
+      {/* Selected Filters */}
+      <Stack direction="row" spacing={1} mb={2}>
+        {tags.map((tag) => (
+          <Chip
+            key={tag.key}
+            label={`${tag.key}: ${tag.value}`}
+            onDelete={() => onRemoveTag(tag.key)}
+            sx={{
+              fontSize: 14,
+              fontWeight: "600", // đậm chữ
+              color: "#272727ff",
+            }}
+          />
+        ))}
+      </Stack>
+
       {!results.length ? (
         <p style={{ textAlign: "center", marginTop: "2rem", color: "#6b7280" }}>
           Không có dữ liệu
         </p>
       ) : (
         <>
-          {/* Selected Filters */}
-          <Stack direction="row" spacing={1} mb={2}>
-            {tags.map((tag) => (
-              <Chip
-                key={tag.key}
-                label={`${tag.key}: ${tag.value}`}
-                onDelete={() => onRemoveTag(tag.key)}
-                sx={{
-                  fontSize: 14,
-                  fontWeight: "600", // đậm chữ
-                  color: "#272727ff",
-                }}
-              />
-            ))}
-          </Stack>
-
           {/* Results Header with Sorting */}
           <div
             style={{
@@ -171,16 +171,16 @@ export default function SearchResults({
                     display: "inline-block",
                     marginTop: "0.5rem",
                     backgroundColor: formatColorsFileType(
-                      getFileType(item.LoaiFile)
+                      getFileType(item.FileUrl)
                     ),
                     color: "#fff",
                     fontSize: "0.75rem",
                     fontWeight: "600",
                     padding: "0.25rem 0.625rem",
-                    borderRadius: "9999px",
+                    borderRadius: "5px",
                   }}
                 >
-                  {getFileType(item.LoaiFile)}
+                  {getFileType(item.FileUrl)}
                 </span>
               </div>
             ))}

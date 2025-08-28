@@ -1,11 +1,14 @@
-import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
-  const token = cookies().get("token")?.value;
+  const router = useRouter();
 
-  if (!token) {
-    redirect("/homepage");
-  }
-  return <></>;
+  useEffect(() => {
+    router.push("/homepage");
+  }, [router]);
+
+  return null;
 }

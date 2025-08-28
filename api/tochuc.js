@@ -20,11 +20,13 @@ export async function getListTochuc() {
 }
 
 export async function getListPhongBan(Id_so_ban_nganh) {
-  const url = `${NEXT_PUBLIC_API_URL}/api/phongban/list-by-sbn/${Id_so_ban_nganh}`;
+  const url = `${NEXT_PUBLIC_API_URL}/api/phongban/list-by-sbn`;
   console.log("Call API:", url);
 
   try {
-    const res = await axios.get(url);
+    const res = await axios.get(url, {
+      params: { Id_so_ban_nganh: Id_so_ban_nganh },
+    });
     console.log("Lấy danh sách phòng ban thành công", res.data);
 
     return res.data;
