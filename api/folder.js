@@ -92,3 +92,25 @@ export async function getFolderByPhongban(id_phong_ban) {
     handleError(error);
   }
 }
+
+export async function getDetailFolder(id_folder) {
+  const url = `${API_URL}/api/fodler/detail-folder`;
+  console.log("Call API:", url);
+  const token = Cookies.get("token");
+
+  try {
+    const res = await axios.get(url, {
+      params: { id_folder: id_folder },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log("Lấy chi tiết folder thành công", res.data);
+    return res.data;
+  } catch (error) {
+    console.log("Lấy chi tiết folder thất bại");
+    handleError(error);
+  }
+}

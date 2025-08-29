@@ -12,11 +12,13 @@ import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 
 import { getListTopics } from "@/api/topic";
 import { getListTochuc, getListPhongBan } from "@/api/tochuc";
+import { getFolderByPhongban } from "@/api/folder"; // 👈 API lấy folder theo phòng ban
 
 export default function SearchFilters({ filters, setFilters }) {
   const [chuDes, setChuDes] = useState([]);
   const [tochucs, setTochucs] = useState([]);
   const [phongbans, setPhongbans] = useState({});
+  const [folders, setFolders] = useState({}); // 👈 lưu folder theo Id_phong_ban
 
   // style
   const selectedStyle = {
@@ -52,6 +54,17 @@ export default function SearchFilters({ filters, setFilters }) {
       setPhongbans((prev) => ({ ...prev, [tochucId]: data || [] }));
     } catch (err) {
       console.error("Lỗi khi lấy phòng ban:", err);
+    }
+  };
+
+  // fetch folder của từng phòng ban
+  const fetchFolders = async (phongbanId) => {
+    if (folders[phongbanId]) return; // tránh gọi lại nhiều lần
+    try {
+      const data = await getFolderByPhongban(phongbanId);
+      setFolders((prev) => ({ ...prev, [phongbanId]: data || [] }));
+    } catch (err) {
+      console.error("Lỗi khi lấy folder:", err);
     }
   };
 
@@ -109,7 +122,7 @@ export default function SearchFilters({ filters, setFilters }) {
         </AccordionDetails>
       </Accordion>
 
-      {/* Tổ chức + phòng ban */}
+      {/* Tổ chức + phòng ban + folder */}
       <Accordion
         sx={{
           "&.Mui-expanded": { margin: "0 !important" },
@@ -152,7 +165,8 @@ export default function SearchFilters({ filters, setFilters }) {
                     setFilters({
                       ...filters,
                       SoBanNganhIds: [tochuc.Id_so_ban_nganh],
-                      PhongBanIds: [], // reset khi chọn lại sở
+                      PhongBanIds: [],
+                      FolderIds: [],
                     });
                     fetchPhongbans(tochuc.Id_so_ban_nganh);
                   }}
@@ -171,44 +185,93 @@ export default function SearchFilters({ filters, setFilters }) {
                         );
 
                         return (
-                          <div
-                            key={pb.Id_phong_ban}
-                            style={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              alignItems: "center",
-                              padding: "8px 10px",
-                              paddingLeft: "20px",
-                              cursor: "pointer",
-                              ...(isDivisionSelected ? selectedStyle : {}),
-                            }}
-                            onClick={() =>
-                              setFilters({
-                                ...filters,
-                                SoBanNganhIds: [tochuc.Id_so_ban_nganh],
-                                PhongBanIds: [pb.Id_phong_ban],
-                              })
-                            }
-                          >
+                          <div key={pb.Id_phong_ban}>
                             <div
                               style={{
                                 display: "flex",
+                                justifyContent: "space-between",
                                 alignItems: "center",
+                                padding: "8px 10px",
+                                paddingLeft: "20px",
+                                cursor: "pointer",
+                                ...(isDivisionSelected ? selectedStyle : {}),
+                              }}
+                              onClick={() => {
+                                setFilters({
+                                  ...filters,
+                                  SoBanNganhIds: [tochuc.Id_so_ban_nganh],
+                                  PhongBanIds: [pb.Id_phong_ban],
+                                  FolderIds: [],
+                                });
+                                fetchFolders(pb.Id_phong_ban); // 👈 load folder khi chọn phòng ban
                               }}
                             >
-                              <FiberManualRecordIcon
-                                sx={{
-                                  fontSize: 12,
-                                  marginRight: 1,
-                                  color: "inherit",
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
                                 }}
+                              >
+                                <FiberManualRecordIcon
+                                  sx={{
+                                    fontSize: 12,
+                                    marginRight: 1,
+                                    color: "inherit",
+                                  }}
+                                />
+                                <Typography>{pb.TenPhongBan}</Typography>
+                              </div>
+                              <Chip
+                                label={pb.SoLuongFile_PhongBan || 0}
+                                size="small"
                               />
-                              <Typography>{pb.TenPhongBan}</Typography>
                             </div>
-                            <Chip
-                              label={pb.SoLuongFile_PhongBan || 0}
-                              size="small"
-                            />
+
+                            {/* folder */}
+                            {folders[pb.Id_phong_ban] &&
+                              folders[pb.Id_phong_ban].length > 0 && (
+                                <div
+                                  style={{ borderBottom: "1px solid #e0e0e0" }}
+                                >
+                                  {folders[pb.Id_phong_ban].map((f) => {
+                                    const isFolderSelected =
+                                      filters.FolderIds.includes(f.Id_folder);
+
+                                    return (
+                                      <div
+                                        key={f.Id_folder}
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "space-between",
+                                          alignItems: "center",
+                                          padding: "6px 10px",
+                                          paddingLeft: "40px",
+                                          cursor: "pointer",
+                                          ...(isFolderSelected
+                                            ? selectedStyle
+                                            : {}),
+                                        }}
+                                        onClick={() =>
+                                          setFilters({
+                                            ...filters,
+                                            SoBanNganhIds: [
+                                              tochuc.Id_so_ban_nganh,
+                                            ],
+                                            PhongBanIds: [pb.Id_phong_ban],
+                                            FolderIds: [f.Id_folder],
+                                          })
+                                        }
+                                      >
+                                        <Typography>{f.TenFolder}</Typography>
+                                        <Chip
+                                          label={f.SoLuongFile || 0}
+                                          size="small"
+                                        />
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
                           </div>
                         );
                       })}

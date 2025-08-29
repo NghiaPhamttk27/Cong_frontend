@@ -6,6 +6,7 @@ import { search } from "@/api/search";
 import { useSearchParams, useRouter } from "next/navigation";
 import { getDetailTopic } from "@/api/topic";
 import { getDetailTochuc, getDetailPhongban } from "@/api/tochuc";
+import { getDetailFolder } from "@/api/folder"; // 👈 API lấy chi tiết folder
 
 export default function SearchPage() {
   const router = useRouter();
@@ -21,6 +22,9 @@ export default function SearchPage() {
   const phongban = searchParams.get("phongban")
     ? Number(searchParams.get("phongban"))
     : null;
+  const folder = searchParams.get("folder")
+    ? Number(searchParams.get("folder"))
+    : null;
   const keyword = searchParams.get("keyword") || "";
 
   // state filters
@@ -29,6 +33,7 @@ export default function SearchPage() {
     ChuDeIds: topic ? [topic] : [],
     SoBanNganhIds: tochuc ? [tochuc] : [],
     PhongBanIds: phongban ? [phongban] : [],
+    FolderIds: folder ? [folder] : [], // 👈 thêm filter thư mục
     Mode: "and",
   });
 
@@ -38,8 +43,9 @@ export default function SearchPage() {
   const [dataTopic, setDataTopic] = useState(null);
   const [dataTochuc, setDataTochuc] = useState(null);
   const [dataPhongban, setDataPhongban] = useState(null);
+  const [dataFolder, setDataFolder] = useState(null);
 
-  // fetch chi tiết topic, tổ chức, phòng ban
+  // fetch chi tiết topic, tổ chức, phòng ban, folder
   useEffect(() => {
     async function fetchData() {
       try {
@@ -55,12 +61,16 @@ export default function SearchPage() {
           const data = await getDetailPhongban(phongban);
           setDataPhongban(data);
         }
+        if (folder) {
+          const data = await getDetailFolder(folder);
+          setDataFolder(data);
+        }
       } catch (error) {
         console.error("Lỗi khi load dữ liệu:", error);
       }
     }
     fetchData();
-  }, [topic, tochuc, phongban]);
+  }, [topic, tochuc, phongban, folder]);
 
   // Khởi tạo tags từ query
   useEffect(() => {
@@ -73,6 +83,8 @@ export default function SearchPage() {
       initTags.push({ key: "Tổ chức", value: dataTochuc.TenSoBanNganh });
     if (phongban && dataPhongban)
       initTags.push({ key: "Phòng ban", value: dataPhongban.TenPhongBan });
+    if (folder && dataFolder)
+      initTags.push({ key: "Thư mục", value: dataFolder.TenFolder });
 
     setTags(initTags);
   }, [
@@ -80,9 +92,11 @@ export default function SearchPage() {
     topic,
     tochuc,
     phongban,
+    folder,
     dataTopic,
     dataTochuc,
     dataPhongban,
+    dataFolder,
   ]);
 
   // Side-effect: khi filters thay đổi, cập nhật URL và gọi search
@@ -97,6 +111,7 @@ export default function SearchPage() {
           query.set("tochuc", filters.SoBanNganhIds[0]);
         if (filters.PhongBanIds.length)
           query.set("phongban", filters.PhongBanIds[0]);
+        if (filters.FolderIds.length) query.set("folder", filters.FolderIds[0]);
 
         const url = `/homepage/search?${query.toString()}`;
         router.replace(url);
@@ -121,6 +136,7 @@ export default function SearchPage() {
       if (keyToRemove === "Chủ đề") newFilters.ChuDeIds = [];
       if (keyToRemove === "Tổ chức") newFilters.SoBanNganhIds = [];
       if (keyToRemove === "Phòng ban") newFilters.PhongBanIds = [];
+      if (keyToRemove === "Thư mục") newFilters.FolderIds = [];
       return newFilters;
     });
   };
