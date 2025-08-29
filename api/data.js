@@ -79,6 +79,7 @@ export async function uploadFile(data) {
     formData.append("moTa", data.moTa);
     formData.append("id_so_ban_nganh", data.id_so_ban_nganh);
     formData.append("id_phong_ban", data.id_phong_ban);
+    formData.append("id_folder", data.id_folder);
     formData.append("id_chu_de", data.id_chu_de);
     formData.append("file", data.file); // file phải là File object (trong browser) hoặc fs.ReadStream (Node.js)
 

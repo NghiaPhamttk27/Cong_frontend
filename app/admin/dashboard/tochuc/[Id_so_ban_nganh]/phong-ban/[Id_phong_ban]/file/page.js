@@ -22,16 +22,19 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { formatDate } from "@/utils/utils";
 import {
-  getListPhongBan,
-  createPhongban,
-  updatePhongban,
-  deletePhongban,
-} from "@/api/tochuc";
+  createFolder,
+  updateFolder,
+  deleteFolder,
+  getFolderByPhongban,
+} from "@/api/folder";
 import CustomModal from "@/components/customModal";
 
-export default function Phongban({ params }) {
-  const Id_so_ban_nganh = React.use(params).Id_so_ban_nganh; // unwrap params
-  const [dataPhongban, setDataPhongban] = useState([]);
+export default function Folder({ params }) {
+  const unwrapped = React.use(params);
+  const Id_so_ban_nganh = unwrapped.Id_so_ban_nganh;
+  const Id_phong_ban = unwrapped.Id_phong_ban;
+
+  const [dataFolder, setDataFolder] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState([]);
 
@@ -39,9 +42,9 @@ export default function Phongban({ params }) {
   const [openModalCreate, setOpenModalCreate] = useState(false);
   const [openModalUpdate, setOpenModalUpdate] = useState(false);
   const [openModalDelete, setOpenModalDelete] = useState(false);
-  const [tenPhongban, setTenPhongban] = useState("");
+  const [tenFolder, setTenFolder] = useState("");
   const [moTa, setMoTa] = useState("");
-  const [idPhongban, setIdPhongban] = useState("");
+  const [idFolder, setIdFolder] = useState("");
 
   // Alert state
   const [open, setOpen] = useState(false);
@@ -49,64 +52,64 @@ export default function Phongban({ params }) {
   const [message, setMessage] = useState("");
 
   // --- Fetch danh sách ---
-  const fetchPhongbans = async () => {
+  const fetchFolders = async () => {
     setLoading(true);
     try {
-      const data = await getListPhongBan(Id_so_ban_nganh);
-      setDataPhongban(data);
+      const data = await getFolderByPhongban(Id_phong_ban);
+      setDataFolder(data);
     } catch (err) {
-      console.error("Lỗi khi lấy phòng ban:", err);
+      console.error("Lỗi khi lấy folder:", err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchPhongbans();
-  }, [Id_so_ban_nganh]);
+    fetchFolders();
+  }, [Id_phong_ban]);
 
   // --- CRUD API ---
-  const handleAddPhongban = async (ten, moTa) => {
+  const handleAddFolder = async (ten, moTa) => {
     try {
-      await createPhongban(Id_so_ban_nganh, { TenPhongBan: ten, MoTa: moTa });
+      await createFolder(Id_phong_ban, { TenFolder: ten, MoTa: moTa });
       setAlertType("success");
-      setMessage("Tạo phòng ban thành công!");
+      setMessage("Tạo folder thành công!");
       setOpen(true);
       setOpenModalCreate(false);
-      fetchPhongbans();
+      fetchFolders();
     } catch (error) {
       setAlertType("error");
-      setMessage(error.message || "Tạo phòng ban thất bại!");
+      setMessage(error.message || "Tạo folder thất bại!");
       setOpen(true);
     }
   };
 
-  const handleUpdatePhongban = async (ten, moTa) => {
+  const handleUpdateFolder = async (ten, moTa) => {
     try {
-      await updatePhongban(idPhongban, { TenPhongBan: ten, MoTa: moTa });
+      await updateFolder(idFolder, { TenFolder: ten, MoTa: moTa });
       setAlertType("success");
-      setMessage("Cập nhật phòng ban thành công!");
+      setMessage("Cập nhật folder thành công!");
       setOpen(true);
       setOpenModalUpdate(false);
-      fetchPhongbans();
+      fetchFolders();
     } catch (error) {
       setAlertType("error");
-      setMessage(error.message || "Cập nhật phòng ban thất bại!");
+      setMessage(error.message || "Cập nhật folder thất bại!");
       setOpen(true);
     }
   };
 
-  const handleDeletePhongban = async () => {
+  const handleDeleteFolder = async () => {
     try {
-      await deletePhongban(idPhongban);
+      await deleteFolder(idFolder, { TenFolder: tenFolder, MoTa: moTa });
       setAlertType("success");
-      setMessage("Xóa phòng ban thành công!");
+      setMessage("Xóa folder thành công!");
       setOpen(true);
       setOpenModalDelete(false);
-      fetchPhongbans();
+      fetchFolders();
     } catch (error) {
       setAlertType("error");
-      setMessage(error.message || "Xóa phòng ban thất bại!");
+      setMessage(error.message || "Xóa folder thất bại!");
       setOpen(true);
     }
   };
@@ -114,20 +117,22 @@ export default function Phongban({ params }) {
   // --- Modal open functions ---
   const openCreateModal = () => {
     setOpenModalCreate(true);
-    setTenPhongban("");
+    setTenFolder("");
     setMoTa("");
-    setIdPhongban("");
+    setIdFolder("");
   };
 
-  const openUpdateModal = (phongban) => {
-    setIdPhongban(phongban.Id_phong_ban);
-    setTenPhongban(phongban.TenPhongBan);
-    setMoTa(phongban.MoTa);
+  const openUpdateModal = (folder) => {
+    setIdFolder(folder.Id_folder);
+    setTenFolder(folder.TenFolder);
+    setMoTa(folder.MoTa);
     setOpenModalUpdate(true);
   };
 
-  const openDeleteModal = (id) => {
-    setIdPhongban(id);
+  const openDeleteModal = (folder) => {
+    setIdFolder(folder.Id_folder);
+    setTenFolder(folder.TenFolder);
+    setMoTa(folder.MoTa);
     setOpenModalDelete(true);
   };
 
@@ -137,23 +142,7 @@ export default function Phongban({ params }) {
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
-
   const isSelected = (id) => selected.includes(id);
-
-  // const handleBulkDelete = async () => {
-  //   try {
-  //     await Promise.all(selected.map((id) => deletePhongban(id)));
-  //     setAlertType("success");
-  //     setMessage("Xóa thành công!");
-  //     setOpen(true);
-  //     setSelected([]);
-  //     fetchPhongbans();
-  //   } catch (error) {
-  //     setAlertType("error");
-  //     setMessage("Xóa thất bại!");
-  //     setOpen(true);
-  //   }
-  // };
 
   if (loading) return <p>Đang tải...</p>;
 
@@ -166,7 +155,7 @@ export default function Phongban({ params }) {
           onClick={openCreateModal}
           sx={{ marginBottom: 2 }}
         >
-          Thêm Phòng Ban
+          Thêm Thư mục
         </Button>
 
         <Snackbar
@@ -179,18 +168,6 @@ export default function Phongban({ params }) {
             {message}
           </Alert>
         </Snackbar>
-
-        {/* {selected.length > 0 && (
-          <Box mb={2}>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={handleBulkDelete}
-            >
-              Xóa {selected.length} hàng
-            </Button>
-          </Box>
-        )} */}
       </div>
 
       <TableContainer>
@@ -199,52 +176,41 @@ export default function Phongban({ params }) {
             <TableRow>
               <TableCell />
               <TableCell>STT</TableCell>
-              <TableCell>Tên Phòng Ban</TableCell>
+              <TableCell>Tên Folder</TableCell>
               <TableCell>Mô Tả</TableCell>
               <TableCell>Ngày Tạo</TableCell>
-              <TableCell>Thư mục</TableCell>
               <TableCell>Hành động</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {dataPhongban.map((phongban, index) => (
+            {dataFolder.map((folder, index) => (
               <TableRow
-                key={phongban.Id_phong_ban || index}
+                key={folder.Id_folder || index}
                 hover
-                onClick={() => toggleRow(phongban.Id_phong_ban)}
-                selected={isSelected(phongban.Id_phong_ban)}
+                onClick={() => toggleRow(folder.Id_folder)}
+                selected={isSelected(folder.Id_folder)}
                 sx={{ cursor: "pointer" }}
               >
                 <TableCell padding="checkbox">
-                  <Checkbox checked={isSelected(phongban.Id_phong_ban)} />
+                  <Checkbox checked={isSelected(folder.Id_folder)} />
                 </TableCell>
                 <TableCell>{index + 1}</TableCell>
-                <TableCell>{phongban.TenPhongBan}</TableCell>
-                <TableCell>{phongban.MoTa}</TableCell>
-                <TableCell>{formatDate(phongban.NgayTao)}</TableCell>
-                <TableCell>
-                  <Button
-                    component={Link}
-                    href={`/admin/dashboard/tochuc/${Id_so_ban_nganh}/phong-ban/${phongban.Id_phong_ban}/file`}
-                    variant="contained"
-                    color="success"
-                  >
-                    Xem
-                  </Button>
-                </TableCell>
+                <TableCell>{folder.TenFolder}</TableCell>
+                <TableCell>{folder.MoTa}</TableCell>
+                <TableCell>{formatDate(folder.NgayTao)}</TableCell>
 
                 <TableCell onClick={(e) => e.stopPropagation()}>
                   <IconButton
                     color="primary"
                     size="small"
-                    onClick={() => openUpdateModal(phongban)}
+                    onClick={() => openUpdateModal(folder)}
                   >
                     <EditIcon />
                   </IconButton>
                   <IconButton
                     color="error"
                     size="small"
-                    onClick={() => openDeleteModal(phongban.Id_phong_ban)}
+                    onClick={() => openDeleteModal(folder)}
                   >
                     <DeleteIcon />
                   </IconButton>
@@ -260,13 +226,13 @@ export default function Phongban({ params }) {
         open={openModalCreate}
         onClose={() => setOpenModalCreate(false)}
         type="form"
-        title="Thêm Phòng Ban"
+        title="Thêm Thư mục"
         content={
           <Box display="flex" flexDirection="column" gap={2}>
             <TextField
-              label="Tên Phòng Ban"
-              value={tenPhongban}
-              onChange={(e) => setTenPhongban(e.target.value)}
+              label="Tên Folder"
+              value={tenFolder}
+              onChange={(e) => setTenFolder(e.target.value)}
               fullWidth
             />
             <TextField
@@ -283,7 +249,7 @@ export default function Phongban({ params }) {
           <Button
             variant="contained"
             color="warning"
-            onClick={() => handleAddPhongban(tenPhongban, moTa)}
+            onClick={() => handleAddFolder(tenFolder, moTa)}
           >
             Đồng ý
           </Button>
@@ -294,13 +260,13 @@ export default function Phongban({ params }) {
         open={openModalUpdate}
         onClose={() => setOpenModalUpdate(false)}
         type="form"
-        title="Sửa Phòng Ban"
+        title="Sửa Thư mục"
         content={
           <Box display="flex" flexDirection="column" gap={2}>
             <TextField
-              label="Tên Phòng"
-              value={tenPhongban}
-              onChange={(e) => setTenPhongban(e.target.value)}
+              label="Tên Folder"
+              value={tenFolder}
+              onChange={(e) => setTenFolder(e.target.value)}
               fullWidth
             />
             <TextField
@@ -317,7 +283,7 @@ export default function Phongban({ params }) {
           <Button
             variant="contained"
             color="warning"
-            onClick={() => handleUpdatePhongban(tenPhongban, moTa)}
+            onClick={() => handleUpdateFolder(tenFolder, moTa)}
           >
             Đồng ý
           </Button>
@@ -328,19 +294,17 @@ export default function Phongban({ params }) {
         open={openModalDelete}
         onClose={() => setOpenModalDelete(false)}
         type="error"
-        title="Xóa Phòng Ban"
+        title="Xóa Thư mục"
         content={
           <Box display="flex" flexDirection="column" gap={2}>
-            <Typography>
-              Bạn có chắc chắn muốn xóa phòng ban này không?
-            </Typography>
+            <Typography>Bạn có chắc chắn muốn xóa folder này không?</Typography>
           </Box>
         }
         footer={
           <Button
             variant="contained"
             color="error"
-            onClick={handleDeletePhongban}
+            onClick={handleDeleteFolder}
           >
             Xóa
           </Button>

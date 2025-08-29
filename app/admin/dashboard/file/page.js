@@ -17,22 +17,19 @@ import {
   TextField,
   Typography,
   MenuItem,
-  Select,
-  InputLabel,
-  FormControl,
   Link,
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import DownloadIcon from "@mui/icons-material/Download";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { formatDate } from "@/utils/utils";
+import { formatDate, formatLink } from "@/utils/utils";
 import { uploadFile, deleteFile, replaceFile } from "@/api/data";
 import { search } from "@/api/search";
 import { getListTochuc, getListPhongBan } from "@/api/tochuc";
 import { getListTopics } from "@/api/topic";
+import { getFolderByPhongban } from "@/api/folder";
 import CustomModal from "@/components/customModal";
-import { formatLink } from "@/utils/utils";
 
 export default function FilesPage() {
   const [dataFiles, setDataFiles] = useState([]);
@@ -44,36 +41,16 @@ export default function FilesPage() {
   const [openModalDelete, setOpenModalDelete] = useState(false);
   const [openModalReplace, setOpenModalReplace] = useState(false);
   const [idFileReplace, setIdFileReplace] = useState(null);
-
   const [idFile, setIdFile] = useState("");
+
+  // --- Alert ---
   const [open, setOpen] = useState(false);
   const [alertType, setAlertType] = useState("success");
   const [message, setMessage] = useState("");
 
   // --- Dropdown data ---
   const [dataTochuc, setDataTochuc] = useState([]);
-  const [dataPhongban, setDataPhongban] = useState([]);
   const [dataTopics, setDataTopics] = useState([]);
-
-  const openReplaceModal = (id_file) => {
-    setIdFileReplace(id_file);
-    setOpenModalReplace(true);
-  };
-
-  const handleReplaceFile = async (newFile) => {
-    try {
-      await replaceFile(idFileReplace, newFile);
-      setAlertType("success");
-      setMessage("Thay thế file thành công!");
-      setOpen(true);
-      setOpenModalReplace(false);
-      fetchFiles();
-    } catch (error) {
-      setAlertType("error");
-      setMessage(error.message || "Thay thế file thất bại!");
-      setOpen(true);
-    }
-  };
 
   const fetchFiles = async () => {
     try {
@@ -98,19 +75,6 @@ export default function FilesPage() {
       setDataTochuc(data);
     } catch (err) {
       console.error("Lỗi khi lấy tochucs:", err);
-    }
-  };
-
-  const fetchPhongbans = async (Id_so_ban_nganh) => {
-    try {
-      if (!Id_so_ban_nganh) {
-        setDataPhongban([]);
-        return;
-      }
-      const data = await getListPhongBan(Id_so_ban_nganh);
-      setDataPhongban(data);
-    } catch (err) {
-      console.error("Lỗi khi lấy phongbans:", err);
     }
   };
 
@@ -151,7 +115,8 @@ export default function FilesPage() {
     moTa,
     id_tochuc,
     id_phongban,
-    id_chude
+    id_chude,
+    id_folder
   ) => {
     try {
       await uploadFile({
@@ -161,6 +126,7 @@ export default function FilesPage() {
         id_so_ban_nganh: id_tochuc,
         id_phong_ban: id_phongban,
         id_chu_de: id_chude,
+        id_folder: id_folder,
       });
       setAlertType("success");
       setMessage("Upload file thành công!");
@@ -173,19 +139,6 @@ export default function FilesPage() {
       setOpen(true);
     }
   };
-
-  const openDeleteModal = (id_file) => {
-    setIdFile(id_file);
-    setOpenModalDelete(true);
-  };
-
-  const toggleRow = (id) => {
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
-  };
-
-  const isSelected = (id) => selected.includes(id);
 
   if (loading) return <p>Đang tải...</p>;
 
@@ -200,22 +153,7 @@ export default function FilesPage() {
         Tải File
       </Button>
 
-      {/* {selected.length > 0 && (
-        <Box mb={2}>
-          <Button
-            variant="contained"
-            color="error"
-            onClick={() => {
-              selected.forEach((id) => deleteFile(id));
-              setSelected([]);
-              fetchFiles();
-            }}
-          >
-            Xóa {selected.length} file
-          </Button>
-        </Box>
-      )} */}
-
+      {/* Thông báo */}
       <Snackbar
         open={open}
         autoHideDuration={3000}
@@ -229,28 +167,41 @@ export default function FilesPage() {
 
       {/* Modal upload */}
       <UploadFileForm
-        openModalCreate={openModalCreate}
-        setOpenModalCreate={setOpenModalCreate}
+        open={openModalCreate}
+        onClose={() => setOpenModalCreate(false)}
         handleUploadFile={handleUploadFile}
         dataTochuc={dataTochuc}
-        dataPhongban={dataPhongban}
         dataTopics={dataTopics}
-        fetchPhongbans={fetchPhongbans}
       />
 
       {/* Modal xóa */}
       <DeleteFileForm
-        openModalDelete={openModalDelete}
-        setOpenModalDelete={setOpenModalDelete}
+        open={openModalDelete}
+        onClose={() => setOpenModalDelete(false)}
         handleDeleteFile={handleDeleteFile}
       />
 
+      {/* Modal thay thế */}
       <ReplaceFileForm
-        openModalReplace={openModalReplace}
-        setOpenModalReplace={setOpenModalReplace}
-        handleReplaceFile={handleReplaceFile}
+        open={openModalReplace}
+        onClose={() => setOpenModalReplace(false)}
+        handleReplaceFile={async (file) => {
+          try {
+            await replaceFile(idFileReplace, file);
+            setAlertType("success");
+            setMessage("Thay thế file thành công!");
+            setOpen(true);
+            setOpenModalReplace(false);
+            fetchFiles();
+          } catch (error) {
+            setAlertType("error");
+            setMessage(error.message || "Thay thế file thất bại!");
+            setOpen(true);
+          }
+        }}
       />
 
+      {/* Table danh sách */}
       <TableContainer>
         <Table>
           <TableHead>
@@ -261,6 +212,7 @@ export default function FilesPage() {
               <TableCell>Mô tả</TableCell>
               <TableCell>Tổ chức</TableCell>
               <TableCell>Phòng ban</TableCell>
+              <TableCell>Thư mục</TableCell>
               <TableCell>Chủ đề</TableCell>
               <TableCell>Ngày tạo</TableCell>
               <TableCell>Hành động</TableCell>
@@ -268,25 +220,19 @@ export default function FilesPage() {
           </TableHead>
           <TableBody>
             {dataFiles.map((file, index) => (
-              <TableRow
-                key={file.Id_file || index}
-                hover
-                onClick={() => toggleRow(file.Id_file)}
-                selected={isSelected(file.Id_file)}
-                sx={{ cursor: "pointer" }}
-              >
+              <TableRow key={file.Id_file || index} hover>
                 <TableCell padding="checkbox">
-                  <Checkbox checked={isSelected(file.Id_file)} />
+                  <Checkbox />
                 </TableCell>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>{file.TieuDe}</TableCell>
                 <TableCell>{file.MoTa}</TableCell>
                 <TableCell>{file.SoBanNganh?.TenSoBanNganh}</TableCell>
                 <TableCell>{file.PhongBan?.TenPhongBan}</TableCell>
+                <TableCell>{file.Folder?.TenFolder}</TableCell>
                 <TableCell>{file.ChuDe?.TenChuDe}</TableCell>
                 <TableCell>{formatDate(file.NgayTao)}</TableCell>
-                <TableCell onClick={(e) => e.stopPropagation()}>
-                  {/* Xem trước */}
+                <TableCell>
                   <Link
                     href={formatLink(file.FileUrl)}
                     target="_blank"
@@ -296,28 +242,32 @@ export default function FilesPage() {
                       <VisibilityIcon />
                     </IconButton>
                   </Link>
-
-                  {/* Tải xuống */}
-                  <Link href={file.FileUrl} target="" rel="noopener noreferrer">
+                  <Link
+                    href={file.FileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <IconButton color="success" size="small">
                       <DownloadIcon />
                     </IconButton>
                   </Link>
-
-                  {/* Thay thế */}
                   <IconButton
                     color="primary"
                     size="small"
-                    onClick={() => openReplaceModal(file.Id_file)}
+                    onClick={() => {
+                      setIdFileReplace(file.Id_file);
+                      setOpenModalReplace(true);
+                    }}
                   >
                     <EditIcon />
                   </IconButton>
-
-                  {/* Xoá */}
                   <IconButton
                     color="error"
                     size="small"
-                    onClick={() => openDeleteModal(file.Id_file)}
+                    onClick={() => {
+                      setIdFile(file.Id_file);
+                      setOpenModalDelete(true);
+                    }}
                   >
                     <DeleteIcon />
                   </IconButton>
@@ -331,33 +281,40 @@ export default function FilesPage() {
   );
 }
 
+/* ------------------- Upload Form ------------------- */
 const UploadFileForm = ({
-  openModalCreate,
-  setOpenModalCreate,
+  open,
+  onClose,
   handleUploadFile,
   dataTochuc,
-  dataPhongban,
   dataTopics,
-  fetchPhongbans,
 }) => {
   const [tieuDe, setTieuDe] = useState("");
   const [moTa, setMoTa] = useState("");
   const [file, setFile] = useState(null);
+
   const [selectedTochuc, setSelectedTochuc] = useState("");
   const [selectedPhongban, setSelectedPhongban] = useState("");
+  const [selectedFolder, setSelectedFolder] = useState("");
   const [selectedTopic, setSelectedTopic] = useState("");
 
-  // Khi chọn tổ chức -> gọi API load phòng ban
-  const handleChangeTochuc = (id) => {
-    setSelectedTochuc(id);
-    setSelectedPhongban(""); // reset phòng ban
-    fetchPhongbans(id); // gọi API với tổ chức đã chọn
+  const [dataPhongban, setDataPhongban] = useState([]);
+  const [dataFolders, setDataFolders] = useState([]);
+
+  const loadPhongbans = async (idTochuc) => {
+    const data = await getListPhongBan(idTochuc);
+    setDataPhongban(data);
+  };
+
+  const loadFolders = async (idPhongban) => {
+    const data = await getFolderByPhongban(idPhongban);
+    setDataFolders(data);
   };
 
   return (
     <CustomModal
-      open={openModalCreate}
-      onClose={() => setOpenModalCreate(false)}
+      open={open}
+      onClose={onClose}
       type="form"
       title="Upload file"
       content={
@@ -377,12 +334,18 @@ const UploadFileForm = ({
             rows={3}
           />
 
-          {/* Dropdown chọn tổ chức */}
+          {/* Tổ chức */}
           <TextField
             select
             label="Tổ chức"
             value={selectedTochuc}
-            onChange={(e) => handleChangeTochuc(e.target.value)}
+            onChange={(e) => {
+              const val = e.target.value;
+              setSelectedTochuc(val);
+              setSelectedPhongban("");
+              setSelectedFolder("");
+              loadPhongbans(val);
+            }}
             fullWidth
           >
             {dataTochuc.map((tc) => (
@@ -392,14 +355,19 @@ const UploadFileForm = ({
             ))}
           </TextField>
 
-          {/* Dropdown chọn phòng ban */}
+          {/* Phòng ban */}
           <TextField
             select
             label="Phòng ban"
             value={selectedPhongban}
-            onChange={(e) => setSelectedPhongban(e.target.value)}
+            onChange={(e) => {
+              const val = e.target.value;
+              setSelectedPhongban(val);
+              setSelectedFolder("");
+              loadFolders(val);
+            }}
             fullWidth
-            disabled={!selectedTochuc} // chỉ enable khi chọn tổ chức
+            disabled={!selectedTochuc}
           >
             {dataPhongban.map((pb) => (
               <MenuItem key={pb.Id_phong_ban} value={pb.Id_phong_ban}>
@@ -408,7 +376,23 @@ const UploadFileForm = ({
             ))}
           </TextField>
 
-          {/* Dropdown chọn chủ đề */}
+          {/* Thư mục */}
+          <TextField
+            select
+            label="Thư mục"
+            value={selectedFolder}
+            onChange={(e) => setSelectedFolder(e.target.value)}
+            fullWidth
+            disabled={!selectedPhongban}
+          >
+            {dataFolders.map((fd) => (
+              <MenuItem key={fd.Id_folder} value={fd.Id_folder}>
+                {fd.TenFolder}
+              </MenuItem>
+            ))}
+          </TextField>
+
+          {/* Chủ đề */}
           <TextField
             select
             label="Chủ đề"
@@ -441,7 +425,8 @@ const UploadFileForm = ({
               moTa,
               selectedTochuc,
               selectedPhongban,
-              selectedTopic
+              selectedTopic,
+              selectedFolder
             )
           }
         >
@@ -452,46 +437,29 @@ const UploadFileForm = ({
   );
 };
 
-const DeleteFileForm = ({
-  handleDeleteFile,
-  openModalDelete,
-  setOpenModalDelete,
-}) => {
-  return (
-    <CustomModal
-      open={openModalDelete}
-      onClose={() => setOpenModalDelete(false)}
-      type="error"
-      title="Xóa file"
-      content={
-        <Box display="flex" flexDirection="column" gap={2}>
-          <Typography>Bạn có chắc chắn muốn xóa file này không?</Typography>
-        </Box>
-      }
-      footer={
-        <Button
-          variant="contained"
-          color="error"
-          onClick={() => handleDeleteFile()}
-        >
-          Xóa
-        </Button>
-      }
-    />
-  );
-};
+/* ------------------- Delete Form ------------------- */
+const DeleteFileForm = ({ open, onClose, handleDeleteFile }) => (
+  <CustomModal
+    open={open}
+    onClose={onClose}
+    type="error"
+    title="Xóa file"
+    content={<Typography>Bạn có chắc chắn muốn xóa file này không?</Typography>}
+    footer={
+      <Button variant="contained" color="error" onClick={handleDeleteFile}>
+        Xóa
+      </Button>
+    }
+  />
+);
 
-const ReplaceFileForm = ({
-  openModalReplace,
-  setOpenModalReplace,
-  handleReplaceFile,
-}) => {
+/* ------------------- Replace Form ------------------- */
+const ReplaceFileForm = ({ open, onClose, handleReplaceFile }) => {
   const [file, setFile] = useState(null);
-
   return (
     <CustomModal
-      open={openModalReplace}
-      onClose={() => setOpenModalReplace(false)}
+      open={open}
+      onClose={onClose}
       type="form"
       title="Thay thế file"
       content={
