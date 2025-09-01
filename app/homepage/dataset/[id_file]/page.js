@@ -9,7 +9,7 @@ import { formatLink, formatDate } from "@/utils/utils"; // utils của bạn
 
 const styles = {
   container: {
-    padding: "100px 10vw",
+    padding: "50px 10vw",
     fontFamily: "sans-serif",
   },
   header: {
@@ -74,6 +74,42 @@ export default function DatasetDetail({ params }) {
 
   return (
     <div style={styles.container}>
+      <div
+        style={{
+          marginBottom: 30,
+          fontSize: "16px",
+          color: "#555",
+        }}
+      >
+        <a
+          href="/homepage"
+          style={{
+            color: "green",
+            textDecoration: "none",
+            fontWeight: "500",
+            marginRight: 8,
+          }}
+        >
+          Trang chủ
+        </a>
+        <span style={{ margin: "0 8px", color: "#999" }}>{">"}</span>
+
+        <a
+          href="/homepage/search"
+          style={{
+            color: "green",
+            textDecoration: "none",
+            fontWeight: "500",
+            marginRight: 8,
+          }}
+        >
+          Tìm kiếm dữ liệu
+        </a>
+        <span style={{ margin: "0 8px", color: "#999" }}>{">"}</span>
+
+        <span style={{ fontWeight: "500" }}>{fileData.TieuDe}</span>
+      </div>
+
       {/* HEADER */}
       <h1 style={styles.header}>{fileData.TieuDe}</h1>
       {/* META INFO */}
@@ -127,103 +163,130 @@ export default function DatasetDetail({ params }) {
 
       <div
         style={{
+          display: "flex",
           padding: 20,
           background: "#ebf5ffff",
           borderRadius: 10,
           border: "solid 1px #f6f6f6ff",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        {/* THÔNG TIN FILE */}
-        <div style={styles.descriptionRow}>
-          <span style={styles.descriptionLabel}>Tiêu đề:</span>
-          <span style={styles.descriptionValue}>{fileData.TieuDe}</span>
+        <div
+          style={{
+            width: 700,
+            paddingLeft: 20,
+          }}
+        >
+          {/* THÔNG TIN FILE */}
+          <div style={styles.descriptionRow}>
+            <span style={styles.descriptionLabel}>Tiêu đề:</span>
+            <span style={styles.descriptionValue}>{fileData.TieuDe}</span>
+          </div>
+          <div style={styles.descriptionRow}>
+            <span style={styles.descriptionLabel}>Mô tả:</span>
+            <span style={styles.descriptionValue}>{fileData.MoTa}</span>
+          </div>
+          <div style={styles.descriptionRow}>
+            <span style={styles.descriptionLabel}>Tổ chức:</span>
+            <span style={styles.descriptionValue}>
+              {fileData.SoBanNganh?.TenSoBanNganh}
+            </span>
+          </div>
+          <div style={styles.descriptionRow}>
+            <span style={styles.descriptionLabel}>Phòng ban:</span>
+            <span style={styles.descriptionValue}>
+              {fileData.PhongBan?.TenPhongBan}
+            </span>
+          </div>
+          <div style={styles.descriptionRow}>
+            <span style={styles.descriptionLabel}>Chủ đề:</span>
+            <span style={styles.descriptionValue}>
+              {fileData.ChuDe?.TenChuDe}
+            </span>
+          </div>
+          <div style={styles.descriptionRow}>
+            <span style={styles.descriptionLabel}>Mức độ truy cập:</span>
+            <span style={{ ...styles.descriptionValue, color: "#5bb683ff" }}>
+              Công Khai
+            </span>
+          </div>
+          <div style={styles.descriptionRow}>
+            <span style={styles.descriptionLabel}>Ngày tạo:</span>
+            <span style={styles.descriptionValue}>
+              {formatDate(fileData.NgayTao)}
+            </span>
+          </div>
+          <div style={styles.descriptionRow}>
+            <span style={styles.descriptionLabel}>Ngày cập nhật:</span>
+            <span style={styles.descriptionValue}>
+              {fileData.NgayCapNhat
+                ? formatDate(fileData.NgayCapNhat)
+                : "Chưa có "}
+            </span>
+          </div>
+          <div style={styles.descriptionRow}>
+            <span style={styles.descriptionLabel}>Đường dẫn file:</span>
+            <span style={styles.descriptionValue}>
+              <Link href={fileData.FileUrl} style={styles.descriptionLink}>
+                {fileData.FileUrl}
+              </Link>
+            </span>
+          </div>
+          <div style={styles.descriptionRow}>
+            <span style={styles.descriptionLabel}>Lượt xem:</span>
+            <span style={styles.descriptionValue}>{fileData.So_lươt_xem}</span>
+          </div>
+          <div style={styles.descriptionRow}>
+            <span style={styles.descriptionLabel}>Lượt tải:</span>
+            <span style={styles.descriptionValue}>{fileData.So_lươt_tai}</span>
+          </div>
         </div>
-        <div style={styles.descriptionRow}>
-          <span style={styles.descriptionLabel}>Mô tả:</span>
-          <span style={styles.descriptionValue}>{fileData.MoTa}</span>
-        </div>
-        <div style={styles.descriptionRow}>
-          <span style={styles.descriptionLabel}>Tổ chức:</span>
-          <span style={styles.descriptionValue}>
-            {fileData.SoBanNganh?.TenSoBanNganh}
-          </span>
-        </div>
-        <div style={styles.descriptionRow}>
-          <span style={styles.descriptionLabel}>Phòng ban:</span>
-          <span style={styles.descriptionValue}>
-            {fileData.PhongBan?.TenPhongBan}
-          </span>
-        </div>
-        <div style={styles.descriptionRow}>
-          <span style={styles.descriptionLabel}>Chủ đề:</span>
-          <span style={styles.descriptionValue}>
-            {fileData.ChuDe?.TenChuDe}
-          </span>
-        </div>
-        <div style={styles.descriptionRow}>
-          <span style={styles.descriptionLabel}>Mức độ truy cập:</span>
-          <span style={{ ...styles.descriptionValue, color: "#5bb683ff" }}>
-            Công Khai
-          </span>
-        </div>
-        <div style={styles.descriptionRow}>
-          <span style={styles.descriptionLabel}>Ngày tạo:</span>
-          <span style={styles.descriptionValue}>
-            {formatDate(fileData.NgayTao)}
-          </span>
-        </div>
-        <div style={styles.descriptionRow}>
-          <span style={styles.descriptionLabel}>Ngày cập nhật:</span>
-          <span style={styles.descriptionValue}>
-            {fileData.NgayCapNhat
-              ? formatDate(fileData.NgayCapNhat)
-              : "Chưa có "}
-          </span>
-        </div>
-        <div style={styles.descriptionRow}>
-          <span style={styles.descriptionLabel}>Đường dẫn file:</span>
-          <span style={styles.descriptionValue}>
-            <Link href={fileData.FileUrl} style={styles.descriptionLink}>
-              {fileData.FileUrl}
-            </Link>
-          </span>
-        </div>
-        <div style={styles.descriptionRow}>
-          <span style={styles.descriptionLabel}>Lượt xem:</span>
-          <span style={styles.descriptionValue}>{fileData.So_lươt_xem}</span>
-        </div>
-        <div style={styles.descriptionRow}>
-          <span style={styles.descriptionLabel}>Lượt tải:</span>
-          <span style={styles.descriptionValue}>{fileData.So_lươt_tai}</span>
-        </div>
+        <div
+          style={{
+            flex: 1,
+            padding: 20,
+            justifyContent: "center",
+            alignItems: "center",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <iframe
+            src={formatLink(fileData.FileUrl)}
+            width="100%"
+            height="600px"
+            style={{ border: "none" }}
+          ></iframe>
 
-        {/* ACTIONS */}
-        <div style={{ display: "flex", gap: 20, marginTop: 20 }}>
-          <Link
-            href={formatLink(fileData.FileUrl)}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Button
-              variant="contained"
-              startIcon={<RemoveRedEyeIcon />}
-              sx={{
-                backgroundColor: "#ff9800",
-                "&:hover": { backgroundColor: "#fb8c00" },
-              }}
+          {/* ACTIONS */}
+          <div style={{ display: "flex", gap: 20, marginTop: 20 }}>
+            <Link
+              href={formatLink(fileData.FileUrl)}
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              Xem trước
-            </Button>
-          </Link>
-          <Link href={fileData.FileUrl} target="" rel="noopener noreferrer">
-            <Button
-              variant="contained"
-              endIcon={<DownloadIcon />}
-              onClick={handleDownloadFile}
-            >
-              Tải về
-            </Button>
-          </Link>
+              <Button
+                variant="contained"
+                startIcon={<RemoveRedEyeIcon />}
+                sx={{
+                  backgroundColor: "#ff9800",
+                  "&:hover": { backgroundColor: "#fb8c00" },
+                }}
+              >
+                Xem trước
+              </Button>
+            </Link>
+            <Link href={fileData.FileUrl} target="" rel="noopener noreferrer">
+              <Button
+                variant="contained"
+                endIcon={<DownloadIcon />}
+                onClick={handleDownloadFile}
+              >
+                Tải về
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     </div>

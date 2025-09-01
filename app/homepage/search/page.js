@@ -114,7 +114,7 @@ export default function SearchPage() {
         if (filters.FolderIds.length) query.set("folder", filters.FolderIds[0]);
 
         const url = `/homepage/search?${query.toString()}`;
-        router.replace(url);
+        router.replace(url, { scroll: false });
 
         // Gọi API search dựa trên filter
         const data = await search(filters);
@@ -142,21 +142,47 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="flex" style={{ display: "flex", padding: "100px 10vw" }}>
-      {/* Sidebar filters */}
-      <div style={{ width: "300px" }}>
-        <SearchFilters filters={filters} setFilters={setFilters} />
+    <div className="flex" style={{ padding: "50px 10vw" }}>
+      <div
+        style={{
+          marginBottom: 50,
+          fontSize: "16px",
+          color: "#555",
+        }}
+      >
+        <a
+          href="/homepage"
+          style={{
+            color: "green",
+            textDecoration: "none",
+            fontWeight: "500",
+            marginRight: 8,
+          }}
+        >
+          Trang chủ
+        </a>
+        <span style={{ margin: "0 8px", color: "#999", fontWeight: 600 }}>
+          {">"}
+        </span>
+        <span style={{ fontWeight: "500" }}>Tìm kiếm dữ liệu</span>
       </div>
 
-      {/* Results */}
-      <div className="flex-1 p-4" style={{ paddingLeft: 50, flex: 1 }}>
-        <SearchResults
-          results={results}
-          tags={tags}
-          onRemoveTag={handleRemoveTag}
-          filters={filters}
-          setFilters={setFilters}
-        />
+      <div style={{ display: "flex" }}>
+        {/* Sidebar filters */}
+        <div style={{ width: "350px" }}>
+          <SearchFilters filters={filters} setFilters={setFilters} />
+        </div>
+
+        {/* Results */}
+        <div className="flex-1 p-4" style={{ paddingLeft: 70, flex: 1 }}>
+          <SearchResults
+            results={results}
+            tags={tags}
+            onRemoveTag={handleRemoveTag}
+            filters={filters}
+            setFilters={setFilters}
+          />
+        </div>
       </div>
     </div>
   );

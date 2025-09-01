@@ -7,6 +7,7 @@ import {
   Typography,
   Chip,
 } from "@mui/material";
+import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 
@@ -262,7 +263,22 @@ export default function SearchFilters({ filters, setFilters }) {
                                           })
                                         }
                                       >
-                                        <Typography>{f.TenFolder}</Typography>
+                                        <Typography
+                                          sx={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                          }}
+                                        >
+                                          <FolderOpenIcon
+                                            sx={{
+                                              fontSize: 16,
+                                              marginRight: 1,
+                                              color: "inherit",
+                                            }}
+                                          />
+                                          {f.TenFolder}
+                                        </Typography>
+
                                         <Chip
                                           label={f.SoLuongFile || 0}
                                           size="small"

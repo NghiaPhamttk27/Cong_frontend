@@ -10,7 +10,7 @@ const Header = () => {
         top: 0,
         width: "100%",
         backgroundColor: "#ebfaf5",
-        padding: "20px 10vw",
+        padding: "15px 10vw",
         zIndex: 1000,
         boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
         display: "flex",
@@ -22,13 +22,13 @@ const Header = () => {
       <Link
         href="/homepage"
         style={{
-          fontSize: "30px",
+          fontSize: "28px",
           fontWeight: "600",
           color: "#166534",
           textDecoration: "none",
         }}
       >
-        Cổng dữ liệu
+        Dữ liệu mở
       </Link>
 
       {/* Button */}
