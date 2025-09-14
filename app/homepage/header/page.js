@@ -1,8 +1,22 @@
+"use client";
 import React from "react";
 import { Button } from "@mui/material";
 import Link from "next/link";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 const Header = () => {
+  const router = useRouter();
+
+  const handleLogout = () => {
+    // ❌ Xóa cookie
+    Cookies.remove("access_token");
+    Cookies.remove("roles");
+
+    // 👉 Chuyển hướng về trang login
+    router.push("/login");
+  };
+
   return (
     <div
       style={{
@@ -28,13 +42,12 @@ const Header = () => {
           textDecoration: "none",
         }}
       >
-        Dữ liệu mở
+        Hướng dẫn sử dụng
       </Link>
 
-      {/* Button */}
-      {/* <Button variant="contained" color="primary">
-        Đăng nhập
-      </Button> */}
+      <Button variant="contained" color="error" onClick={handleLogout}>
+        Đăng xuất
+      </Button>
     </div>
   );
 };

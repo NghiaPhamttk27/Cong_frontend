@@ -108,7 +108,7 @@ export default function Layout({ children }) {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            Trang Amin Cổng dữ liệu
+            Trang quản trị Hướng dẫn sử dụng
           </Typography>
         </Toolbar>
       </AppBar>
