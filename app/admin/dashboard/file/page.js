@@ -213,7 +213,7 @@ export default function FilesPage() {
               <TableCell>Tổ chức</TableCell>
               <TableCell>Phòng ban</TableCell>
               <TableCell>Thư mục</TableCell>
-              <TableCell>Chủ đề</TableCell>
+              <TableCell>Lĩnh vực</TableCell>
               <TableCell>Ngày tạo</TableCell>
               <TableCell>Hành động</TableCell>
             </TableRow>
@@ -234,7 +234,11 @@ export default function FilesPage() {
                 <TableCell>{formatDate(file.NgayTao)}</TableCell>
                 <TableCell>
                   <Link
-                    href={formatLink(file.FileUrl)}
+                    href={
+                      file.FileUrl.endsWith(".pdf")
+                        ? file.FileUrl
+                        : formatLink(file.FileUrl)
+                    }
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -392,10 +396,10 @@ const UploadFileForm = ({
             ))}
           </TextField>
 
-          {/* Chủ đề */}
+          {/* Lĩnh vực */}
           <TextField
             select
-            label="Chủ đề"
+            label="Lĩnh vực"
             value={selectedTopic}
             onChange={(e) => setSelectedTopic(e.target.value)}
             fullWidth

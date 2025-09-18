@@ -129,7 +129,7 @@ export default function ChartComponent() {
         </ResponsiveContainer>
       </div>
 
-      {/* Biểu đồ theo chủ đề */}
+      {/* Biểu đồ theo lĩnh vực */}
       <div
         style={{
           width: 1100,
@@ -154,12 +154,12 @@ export default function ChartComponent() {
             fontSize: 22,
           }}
         >
-          Số lượng dữ liệu theo chủ đề
+          Số lượng dữ liệu theo lĩnh vực
         </div>
         <ResponsiveContainer width="100%" height={450}>
           <BarChart
             layout="vertical"
-            data={dataTopic} // dữ liệu riêng cho chủ đề
+            data={dataTopic} // dữ liệu riêng cho lĩnh vực
             margin={{ top: 0, right: 30, left: 80, bottom: 5 }}
           >
             <CartesianGrid strokeDasharray="3 3" horizontal={false} />

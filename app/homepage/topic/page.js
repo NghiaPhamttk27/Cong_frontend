@@ -40,7 +40,7 @@ export default function Topic() {
 
   return (
     <div>
-      <h2 style={{ margin: "30px 0", textAlign: "center" }}>Chủ đề</h2>
+      <h2 style={{ margin: "30px 0", textAlign: "center" }}>Lĩnh vực</h2>
 
       <div
         style={{
@@ -60,7 +60,7 @@ export default function Topic() {
         ))}
       </div>
 
-      <h2 style={{ margin: "30px 0", textAlign: "center", marginTop: 200 }}>
+      <h2 style={{ margin: "20px 0", textAlign: "center", marginTop: 100 }}>
         Tổ chức
       </h2>
 

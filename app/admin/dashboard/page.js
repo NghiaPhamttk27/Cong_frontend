@@ -68,13 +68,13 @@ export default function Topic() {
     try {
       await createTopic({ TenChuDe: ten, MoTa: moTa });
       setAlertType("success");
-      setMessage("Tạo chủ đề thành công!");
+      setMessage("Tạo lĩnh vực thành công!");
       setOpen(true);
       setOpenModalCreate(false);
       fetchTopics();
     } catch (error) {
       setAlertType("error");
-      setMessage(error.message || "Tạo chủ đề thất bại!");
+      setMessage(error.message || "Tạo lĩnh vực thất bại!");
       setOpen(true);
     }
   };
@@ -83,13 +83,13 @@ export default function Topic() {
     try {
       await updateTopic(idTopic, { TenChuDe: ten, MoTa: moTa });
       setAlertType("success");
-      setMessage("Cập nhật chủ đề thành công!");
+      setMessage("Cập nhật lĩnh vực thành công!");
       setOpen(true);
       setOpenModalUpdate(false);
       fetchTopics();
     } catch (error) {
       setAlertType("error");
-      setMessage(error.message || "Cập nhật chủ đề thất bại!");
+      setMessage(error.message || "Cập nhật lĩnh vực thất bại!");
       setOpen(true);
     }
   };
@@ -98,13 +98,13 @@ export default function Topic() {
     try {
       await deleteTopic(idTopic);
       setAlertType("success");
-      setMessage("Xóa chủ đề thành công!");
+      setMessage("Xóa lĩnh vực thành công!");
       setOpen(true);
       setOpenModalDelete(false);
       fetchTopics();
     } catch (error) {
       setAlertType("error");
-      setMessage(error.message || "Xóa chủ đề thất bại!");
+      setMessage(error.message || "Xóa lĩnh vực thất bại!");
       setOpen(true);
     }
   };
@@ -316,7 +316,9 @@ export default function Topic() {
         title="Xóa Chủ Đề"
         content={
           <Box display="flex" flexDirection="column" gap={2}>
-            <Typography>Bạn có chắc chắn muốn xóa chủ đề này không?</Typography>
+            <Typography>
+              Bạn có chắc chắn muốn xóa lĩnh vực này không?
+            </Typography>
           </Box>
         }
         footer={

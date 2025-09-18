@@ -18,14 +18,14 @@ function Content() {
         flexDirection: "column",
       }}
     >
-      <div style={{ marginBottom: 0, padding: "50px 0" }}>
+      <div style={{ marginBottom: 0, padding: "20px 0" }}>
         <SearchComponent />
       </div>
-      <div style={{ marginBottom: 0, padding: "50px 0" }}>
+      <div style={{ marginBottom: 0, padding: "20px 0" }}>
         <DataList />
       </div>
 
-      <div style={{ marginBottom: 100 }}>
+      <div style={{ marginBottom: 50 }}>
         <Topic />
       </div>
       <div style={{}}>

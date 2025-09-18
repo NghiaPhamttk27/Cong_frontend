@@ -11,6 +11,7 @@ export function middleware(req) {
   if (
     pathname.startsWith("/login") ||
     pathname.startsWith("/admin/login") ||
+    pathname.startsWith("/homepage") ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/public")
   ) {
@@ -25,12 +26,12 @@ export function middleware(req) {
   }
 
   // Nếu vào /homepage thì chỉ cần có token
-  if (pathname.startsWith("/homepage")) {
-    console.log(token, "tokennnn");
-    if (!token) {
-      return NextResponse.redirect(new URL("/login", req.url));
-    }
-  }
+  // if (pathname.startsWith("/homepage")) {
+  //   console.log(token, "tokennnn");
+  //   if (!token) {
+  //     return NextResponse.redirect(new URL("/login", req.url));
+  //   }
+  // }
 
   return NextResponse.next();
 }

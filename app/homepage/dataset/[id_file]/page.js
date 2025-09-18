@@ -126,9 +126,9 @@ export default function DatasetDetail({ params }) {
           <span role="img" aria-label="topic">
             🗄️
           </span>
-          <span style={{ fontWeight: "bold" }}>Chủ đề:</span>
+          <span style={{ fontWeight: "bold" }}>Lĩnh vực:</span>
           <Link
-            href={`/homepage/search?topic=${fileData.ChuDe.Id_chu_de}`}
+            href={`/homepage/search?topic=${fileData.ChuDe?.Id_chu_de}`}
             style={{ color: "#007bff", textDecoration: "none" }}
           >
             {fileData.ChuDe?.TenChuDe}
@@ -174,8 +174,9 @@ export default function DatasetDetail({ params }) {
       >
         <div
           style={{
-            width: 700,
+            width: 500,
             paddingLeft: 20,
+            marginRight: 20,
           }}
         >
           {/* THÔNG TIN FILE */}
@@ -200,7 +201,7 @@ export default function DatasetDetail({ params }) {
             </span>
           </div>
           <div style={styles.descriptionRow}>
-            <span style={styles.descriptionLabel}>Chủ đề:</span>
+            <span style={styles.descriptionLabel}>Lĩnh vực:</span>
             <span style={styles.descriptionValue}>
               {fileData.ChuDe?.TenChuDe}
             </span>
@@ -250,10 +251,15 @@ export default function DatasetDetail({ params }) {
             alignItems: "center",
             display: "flex",
             flexDirection: "column",
+            marginLeft: 20,
           }}
         >
           <iframe
-            src={formatLink(fileData.FileUrl)}
+            src={
+              fileData.FileUrl.endsWith(".pdf")
+                ? fileData.FileUrl
+                : formatLink(fileData.FileUrl)
+            }
             width="100%"
             height="600px"
             style={{ border: "none" }}
@@ -262,7 +268,11 @@ export default function DatasetDetail({ params }) {
           {/* ACTIONS */}
           <div style={{ display: "flex", gap: 20, marginTop: 20 }}>
             <Link
-              href={formatLink(fileData.FileUrl)}
+              href={
+                fileData.FileUrl.endsWith(".pdf")
+                  ? fileData.FileUrl
+                  : formatLink(fileData.FileUrl)
+              }
               target="_blank"
               rel="noopener noreferrer"
             >

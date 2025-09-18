@@ -79,18 +79,18 @@ export default function Layout({ children }) {
 
   const handleLogout = () => {
     // Xóa cookie
-    Cookies.remove("token", { path: "/" });
-    Cookies.remove("role", { path: "/" });
+    Cookies.remove("token");
+    Cookies.remove("role");
 
     // Điều hướng về trang homepage
     window.location.href = "/admin/login"; // luôn an toàn
   };
 
   const menuItems = [
-    { text: "Quản trị Chủ đề", link: "/admin/dashboard" },
+    { text: "Quản trị Lĩnh vực", link: "/admin/dashboard" },
     { text: "Quản trị Tổ chức", link: "/admin/dashboard/tochuc" },
     { text: "Quản trị File", link: "/admin/dashboard/file" },
-    { text: "Quản trị Người dùng", link: "/admin/dashboard/users" },
+    // { text: "Quản trị Người dùng", link: "/admin/dashboard/users" },
   ];
 
   return (

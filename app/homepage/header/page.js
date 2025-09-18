@@ -42,12 +42,12 @@ const Header = () => {
           textDecoration: "none",
         }}
       >
-        Hướng dẫn sử dụng
+        Google Lào Cai
       </Link>
 
-      <Button variant="contained" color="error" onClick={handleLogout}>
+      {/* <Button variant="contained" color="error" onClick={handleLogout}>
         Đăng xuất
-      </Button>
+      </Button> */}
     </div>
   );
 };

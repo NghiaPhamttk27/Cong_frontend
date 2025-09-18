@@ -47,7 +47,13 @@ export default function SearchResults({
       />
 
       {/* Selected Filters */}
-      <Stack direction="row" spacing={1} mb={2}>
+      <Stack
+        direction="row"
+        gap={1}
+        spacing={1}
+        mb={2}
+        sx={{ flexWrap: "wrap" }}
+      >
         {tags.map((tag) => (
           <Chip
             key={tag.key}

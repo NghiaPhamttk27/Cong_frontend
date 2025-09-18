@@ -4,6 +4,8 @@ import { getLatesFile, getMostViewFile } from "@/api/data";
 import { getFileType, formatDate } from "@/utils/utils";
 import { Link } from "@mui/material";
 import { formatColorsFileType } from "@/utils/utils";
+import { Button } from "@mui/material";
+import { useRouter } from "next/navigation";
 
 // Định nghĩa các đối tượng style
 const mainContainerStyle = {
@@ -97,62 +99,75 @@ const calendarIconStyle = {
   fontSize: "1rem",
 };
 
-const DataSection = ({ title, data }) => (
-  <div style={sectionContainerStyle}>
-    <div style={sectionHeaderStyle}>
-      <h3 style={sectionTitleStyle}>{title}</h3>
-    </div>
-    <div style={dataListStyle}>
-      {data.map((item, index) => {
-        const itemSpecificStyle =
-          index === data.length - 1 ? lastChildStyle : {};
-        const formatStyle = {
-          ...itemFormatBaseStyle,
-          backgroundColor: formatColorsFileType(getFileType(item.FileUrl)),
-        };
+const DataSection = ({ title, data, url }) => {
+  const router = useRouter();
+  return (
+    <div style={sectionContainerStyle}>
+      <div style={sectionHeaderStyle}>
+        <h3 style={sectionTitleStyle}>{title}</h3>
+      </div>
+      <div style={dataListStyle}>
+        {data.map((item, index) => {
+          const itemSpecificStyle =
+            index === data.length - 1 ? lastChildStyle : {};
+          const formatStyle = {
+            ...itemFormatBaseStyle,
+            backgroundColor: formatColorsFileType(getFileType(item.FileUrl)),
+          };
 
-        return (
-          <div key={index} style={{ ...dataItemStyle, ...itemSpecificStyle }}>
-            {/* Chủ đề → search theo topic id */}
-            <Link
-              href={`/homepage/search?topic=${item.ChuDe.Id_chu_de}`}
-              style={{ textDecoration: "none" }}
-            >
-              <p style={{ ...itemCategoryStyle, cursor: "pointer" }}>
-                {item.ChuDe.TenChuDe}
-              </p>
-            </Link>
-
-            {/* Tiêu đề → search theo keyword */}
-            <Link
-              href={`/homepage/search?keyword=${encodeURIComponent(
-                item.TieuDe
-              )}`}
-              style={{ textDecoration: "none", color: "#2b2b2bff" }}
-            >
-              <h4
-                style={{
-                  ...itemTitleStyle,
-                  cursor: "pointer",
-                }}
+          return (
+            <div key={index} style={{ ...dataItemStyle, ...itemSpecificStyle }}>
+              {/* Lĩnh vực → search theo topic id */}
+              <Link
+                href={`/homepage/search?topic=${item.ChuDe?.Id_chu_de}`}
+                style={{ textDecoration: "none" }}
               >
-                {item.TieuDe}
-              </h4>
-            </Link>
+                <p style={{ ...itemCategoryStyle, cursor: "pointer" }}>
+                  {item.ChuDe?.TenChuDe}
+                </p>
+              </Link>
 
-            <div style={itemMetaStyle}>
-              <span style={formatStyle}>{getFileType(item.FileUrl)}</span>
-              <span style={itemDateStyle}>
-                <span style={calendarIconStyle}>🗓️</span>
-                {formatDate(item.NgayTao)}
-              </span>
+              {/* Tiêu đề → search theo keyword */}
+              <Link
+                href={`/homepage/search?keyword=${encodeURIComponent(
+                  item.TieuDe
+                )}`}
+                style={{ textDecoration: "none", color: "#2b2b2bff" }}
+              >
+                <h4
+                  style={{
+                    ...itemTitleStyle,
+                    cursor: "pointer",
+                  }}
+                >
+                  {item.TieuDe}
+                </h4>
+              </Link>
+
+              <div style={itemMetaStyle}>
+                <span style={formatStyle}>{getFileType(item.FileUrl)}</span>
+                <span style={itemDateStyle}>
+                  <span style={calendarIconStyle}>🗓️</span>
+                  {formatDate(item.NgayTao)}
+                </span>
+              </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
+      <Button
+        variant="contained"
+        color="primary"
+        style={{ margin: 15 }}
+        onClick={() => {
+          router.push(url);
+        }}
+      >
+        Xem thêm
+      </Button>
     </div>
-  </div>
-);
+  );
+};
 
 export default function DataList() {
   const [latestData, setLatestData] = useState([]);
@@ -177,7 +192,7 @@ export default function DataList() {
     setLoading(true);
     async function fetchMostViewFile() {
       try {
-        const data = await getLatesFile();
+        const data = await getMostViewFile();
         setMostViewData(data);
       } catch (err) {
       } finally {
@@ -203,8 +218,16 @@ export default function DataList() {
 
   return (
     <div style={mainContainerStyle}>
-      <DataSection title="Dữ liệu mới nhất" data={latestData} />
-      <DataSection title="Dữ liệu xem nhiều nhất" data={mostViewData} />
+      <DataSection
+        title="Dữ liệu mới nhất"
+        data={latestData}
+        url="/homepage/data/moi_nhat"
+      />
+      <DataSection
+        title="Dữ liệu xem nhiều nhất"
+        data={mostViewData}
+        url="/homepage/data/xem_nhieu_nhat"
+      />
     </div>
   );
 }

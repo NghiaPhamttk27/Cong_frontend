@@ -27,13 +27,13 @@ export default function SearchFilters({ filters, setFilters }) {
     color: "#3c826bff",
   };
 
-  // fetch Chủ đề
+  // fetch Lĩnh vực
   const fetchTopics = async () => {
     try {
       const data = await getListTopics();
       setChuDes(data || []);
     } catch (err) {
-      console.error("Lỗi khi lấy chủ đề:", err);
+      console.error("Lỗi khi lấy lĩnh vực:", err);
     }
   };
 
@@ -76,7 +76,7 @@ export default function SearchFilters({ filters, setFilters }) {
 
   return (
     <div>
-      {/* Chủ đề */}
+      {/* Lĩnh vực */}
       <Accordion
         sx={{
           "&.Mui-expanded": { margin: "0 !important" },
@@ -93,15 +93,15 @@ export default function SearchFilters({ filters, setFilters }) {
             minHeight: "40px !important",
           }}
         >
-          <Typography>Chủ đề</Typography>
+          <Typography>Lĩnh vực</Typography>
         </AccordionSummary>
         <AccordionDetails sx={{ padding: 0 }}>
           {chuDes.map((cd) => {
-            const isSelected = filters.ChuDeIds.includes(cd.Id_chu_de);
+            const isSelected = filters.ChuDeIds.includes(cd?.Id_chu_de);
 
             return (
               <div
-                key={cd.Id_chu_de}
+                key={cd?.Id_chu_de}
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
@@ -112,10 +112,10 @@ export default function SearchFilters({ filters, setFilters }) {
                   ...(isSelected ? selectedStyle : {}),
                 }}
                 onClick={() =>
-                  setFilters({ ...filters, ChuDeIds: [cd.Id_chu_de] })
+                  setFilters({ ...filters, ChuDeIds: [cd?.Id_chu_de] })
                 }
               >
-                <Typography>{cd.TenChuDe}</Typography>
+                <Typography>{cd?.TenChuDe}</Typography>
                 <Chip label={cd.SoLuongFile_ChuDe || 0} size="small" />
               </div>
             );

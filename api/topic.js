@@ -10,11 +10,11 @@ export async function getListTopics() {
 
   try {
     const res = await axios.get(url);
-    console.log("Lấy danh sách chủ đề thành công", res.data);
+    console.log("Lấy danh sách lĩnh vực thành công", res.data);
 
     return res.data;
   } catch (error) {
-    console.log("Lấy danh sách chủ đề thất bại");
+    console.log("Lấy danh sách lĩnh vực thất bại");
     handleError(error);
   }
 }
@@ -27,10 +27,10 @@ export async function getDetailTopic(id_chu_de) {
     const res = await axios.get(url, {
       params: { id_chu_de },
     });
-    console.log("Lấy chủ đề thành công", res.data);
+    console.log("Lấy lĩnh vực thành công", res.data);
     return res.data;
   } catch (error) {
-    console.error("Lấy chủ đề thất bại:", error);
+    console.error("Lấy lĩnh vực thất bại:", error);
     return null; // hoặc throw error nếu muốn bắt ở ngoài
   }
 }
@@ -47,11 +47,11 @@ export async function createTopic(data) {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log("Tạo chủ đề thành công", res.data);
+    console.log("Tạo lĩnh vực thành công", res.data);
 
     return res.data;
   } catch (error) {
-    console.log("Tạo chủ đề thất bại");
+    console.log("Tạo lĩnh vực thất bại");
     handleError(error);
   }
 }
@@ -69,11 +69,11 @@ export async function updateTopic(id_chu_de, data) {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log("Cập nhật chủ đề thành công", res.data);
+    console.log("Cập nhật lĩnh vực thành công", res.data);
 
     return res.data;
   } catch (error) {
-    console.log("Cập nhật chủ đề thất bại");
+    console.log("Cập nhật lĩnh vực thất bại");
     handleError(error);
   }
 }
@@ -91,11 +91,11 @@ export async function deleteTopic(id_chu_de) {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log("Xóa chủ đề thành công", res.data);
+    console.log("Xóa lĩnh vực thành công", res.data);
 
     return res.data;
   } catch (error) {
-    console.log("Xóa chủ đề thất bại");
+    console.log("Xóa lĩnh vực thất bại");
     handleError(error);
   }
 }

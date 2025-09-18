@@ -79,7 +79,7 @@ export default function SearchPage() {
     if (filters.Keyword)
       initTags.push({ key: "Từ khóa", value: filters.Keyword });
     if (topic && dataTopic)
-      initTags.push({ key: "Chủ đề", value: dataTopic.TenChuDe });
+      initTags.push({ key: "Lĩnh vực", value: dataTopic.TenChuDe });
     if (tochuc && dataTochuc)
       initTags.push({ key: "Tổ chức", value: dataTochuc.TenSoBanNganh });
     if (phongban && dataPhongban)
@@ -134,7 +134,7 @@ export default function SearchPage() {
     setFilters((prev) => {
       const newFilters = { ...prev };
       if (keyToRemove === "Từ khóa") newFilters.Keyword = "";
-      if (keyToRemove === "Chủ đề") newFilters.ChuDeIds = [];
+      if (keyToRemove === "Lĩnh vực") newFilters.ChuDeIds = [];
       if (keyToRemove === "Tổ chức") newFilters.SoBanNganhIds = [];
       if (keyToRemove === "Phòng ban") newFilters.PhongBanIds = [];
       if (keyToRemove === "Thư mục") newFilters.FolderIds = [];
@@ -170,7 +170,7 @@ export default function SearchPage() {
 
       <div style={{ display: "flex" }}>
         {/* Sidebar filters */}
-        <div style={{ width: "350px" }}>
+        <div style={{ width: "350px", flexShrink: 0 }}>
           <SearchFilters filters={filters} setFilters={setFilters} />
         </div>
 

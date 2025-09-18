@@ -58,12 +58,12 @@ export async function getDataTopic() {
 
   try {
     const res = await axios.get(url);
-    console.log("Lấy danh sách Data theo chủ đề thành công", res.data);
+    console.log("Lấy danh sách Data theo lĩnh vực thành công", res.data);
     console.log(res.data);
 
     return res.data;
   } catch (error) {
-    console.log("Lấy danh sách Data theo chủ đề thất bại");
+    console.log("Lấy danh sách Data theo lĩnh vực thất bại");
     handleError(error);
   }
 }
@@ -179,6 +179,38 @@ export async function replaceFile(id_file, file) {
     return res.data;
   } catch (error) {
     console.log("Thay thế file thất bại");
+    handleError(error);
+  }
+}
+
+export async function getLatesFileFull() {
+  const url = `${NEXT_PUBLIC_API_URL}/api/file/latest-full`;
+  console.log("Call API:", url);
+
+  try {
+    const res = await axios.get(url);
+    console.log("Lấy danh sách file mới nhất thành công", res.data);
+    console.log(res.data);
+
+    return res.data;
+  } catch (error) {
+    console.log("Lấy danh sách file mới nhất thất bại");
+    handleError(error);
+  }
+}
+
+export async function getMostViewFileFull() {
+  const url = `${NEXT_PUBLIC_API_URL}/api/file/top-view-full`;
+  console.log("Call API:", url);
+
+  try {
+    const res = await axios.get(url);
+    console.log("Lấy danh sách file xem nhiều nhất thành công", res.data);
+    console.log(res.data);
+
+    return res.data;
+  } catch (error) {
+    console.log("Lấy danh sách file mới nhất thất bại");
     handleError(error);
   }
 }

@@ -26,8 +26,8 @@ export default function LoginPage() {
       const data = await login(username, password);
 
       // Lưu cookie phía client với js-cookie
-      Cookies.set("token", data.access_token, { expires: 14, path: "/" });
-      Cookies.set("role", data.roles, { expires: 14, path: "/" });
+      Cookies.set("token", data.access_token, { expires: 14 });
+      Cookies.set("role", data.roles, { expires: 14 });
 
       // Điều hướng
       if (data.roles === "Admin") {
