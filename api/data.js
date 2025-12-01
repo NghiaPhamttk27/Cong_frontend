@@ -77,6 +77,7 @@ export async function uploadFile(data) {
     const formData = new FormData();
     formData.append("tieuDe", data.tieuDe);
     formData.append("moTa", data.moTa);
+    formData.append("tuKhoa", data.tuKhoa);
     formData.append("id_so_ban_nganh", data.id_so_ban_nganh);
     formData.append("id_phong_ban", data.id_phong_ban);
     formData.append("id_folder", data.id_folder);
@@ -211,6 +212,41 @@ export async function getMostViewFileFull() {
     return res.data;
   } catch (error) {
     console.log("Lấy danh sách file mới nhất thất bại");
+    handleError(error);
+  }
+}
+
+export async function replaceFileV2(id_file, data) {
+  const url = `${NEXT_PUBLIC_API_URL}/api/file/replacev2?id_file=${id_file}`;
+  const token = Cookies.get("token");
+
+  console.log(data, "data");
+
+  try {
+    const formData = new FormData();
+    formData.append("tieuDe", data.tieuDe || "");
+    formData.append("moTa", data.moTa || "");
+    formData.append("tuKhoa", data.tuKhoa || "");
+    formData.append("Id_so_ban_nganh", data.id_so_ban_nganh || "");
+    formData.append("Id_phong_ban", data.id_phong_ban || "");
+    formData.append("Id_chu_de", data.id_chu_de || "");
+    formData.append("Id_folder", data.id_folder || "");
+
+    if (data.file) {
+      formData.append("file", data.file);
+    }
+
+    const res = await axios.post(url, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log("Thay thế file thành công", res.data);
+    return res.data;
+  } catch (error) {
+    console.error("Thay thế file thất bại", error);
     handleError(error);
   }
 }

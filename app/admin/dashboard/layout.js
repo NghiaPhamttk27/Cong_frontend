@@ -73,6 +73,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 export default function Layout({ children }) {
   const theme = useTheme();
   const [open, setOpen] = React.useState(true);
+  const role = Cookies.get("role");
 
   const handleDrawerOpen = () => setOpen(true);
   const handleDrawerClose = () => setOpen(false);
@@ -81,16 +82,18 @@ export default function Layout({ children }) {
     // Xóa cookie
     Cookies.remove("token");
     Cookies.remove("role");
+    Cookies.remove("id_so_ban_nganh");
 
     // Điều hướng về trang homepage
     window.location.href = "/admin/login"; // luôn an toàn
   };
 
   const menuItems = [
-    { text: "Quản trị Lĩnh vực", link: "/admin/dashboard" },
+    ...(role === "Admin"
+      ? [{ text: "Quản trị Lĩnh vực", link: "/admin/dashboard" }]
+      : []),
     { text: "Quản trị Tổ chức", link: "/admin/dashboard/tochuc" },
     { text: "Quản trị File", link: "/admin/dashboard/file" },
-    // { text: "Quản trị Người dùng", link: "/admin/dashboard/users" },
   ];
 
   return (

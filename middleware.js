@@ -20,7 +20,7 @@ export function middleware(req) {
 
   // Nếu vào /admin thì bắt buộc phải là admin
   if (pathname.startsWith("/admin")) {
-    if (!token || role !== "Admin") {
+    if (!token || (role !== "Admin" && role !== "User")) {
       return NextResponse.redirect(new URL("/admin/login", req.url));
     }
   }

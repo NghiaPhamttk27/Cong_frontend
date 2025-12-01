@@ -26,10 +26,14 @@ import {
   updateTochuc,
   deleteTochuc,
 } from "@/api/tochuc";
+import { getListTochucByRole } from "@/api/role-list";
+import Cookies from "js-cookie";
+
 import Link from "next/link";
 import CustomModal from "@/components/customModal";
 
 export default function Tochuc() {
+  const role = Cookies.get("role");
   const [dataTochuc, setDataTochuc] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState([]);
@@ -51,7 +55,8 @@ export default function Tochuc() {
   const fetchTochucs = async () => {
     setLoading(true);
     try {
-      const data = await getListTochuc();
+      const data =
+        role == "Admin" ? await getListTochuc() : await getListTochucByRole();
       setDataTochuc(data);
     } catch (err) {
       console.error("Lỗi khi lấy tochucs:", err);

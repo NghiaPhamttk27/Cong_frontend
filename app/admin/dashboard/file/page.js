@@ -24,14 +24,16 @@ import DownloadIcon from "@mui/icons-material/Download";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { formatDate, formatLink } from "@/utils/utils";
-import { uploadFile, deleteFile, replaceFile } from "@/api/data";
+import { uploadFile, deleteFile, replaceFileV2 } from "@/api/data";
 import { search } from "@/api/search";
 import { getListTochuc, getListPhongBan } from "@/api/tochuc";
 import { getListTopics } from "@/api/topic";
 import { getFolderByPhongban } from "@/api/folder";
 import CustomModal from "@/components/customModal";
+import Cookies from "js-cookie";
 
 export default function FilesPage() {
+  const id_so_ban_nganh = Cookies.get("id_so_ban_nganh");
   const [dataFiles, setDataFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState([]);
@@ -40,7 +42,7 @@ export default function FilesPage() {
   const [openModalCreate, setOpenModalCreate] = useState(false);
   const [openModalDelete, setOpenModalDelete] = useState(false);
   const [openModalReplace, setOpenModalReplace] = useState(false);
-  const [idFileReplace, setIdFileReplace] = useState(null);
+
   const [idFile, setIdFile] = useState("");
 
   // --- Alert ---
@@ -57,7 +59,7 @@ export default function FilesPage() {
       const data = await search({
         Keyword: "",
         ChuDeIds: [],
-        SoBanNganhIds: [],
+        SoBanNganhIds: [id_so_ban_nganh],
         PhongBanIds: [],
         Mode: "and",
       });
@@ -113,6 +115,7 @@ export default function FilesPage() {
     file,
     tieuDe,
     moTa,
+    tuKhoa,
     id_tochuc,
     id_phongban,
     id_chude,
@@ -123,6 +126,7 @@ export default function FilesPage() {
         file,
         tieuDe,
         moTa,
+        tuKhoa,
         id_so_ban_nganh: id_tochuc,
         id_phong_ban: id_phongban,
         id_chu_de: id_chude,
@@ -185,17 +189,22 @@ export default function FilesPage() {
       <ReplaceFileForm
         open={openModalReplace}
         onClose={() => setOpenModalReplace(false)}
-        handleReplaceFile={async (file) => {
+        dataTochuc={dataTochuc}
+        dataTopics={dataTopics}
+        currentFile={selected} // <--- CHÚ Ý: selected (object) không phải selected[0]
+        handleReplaceFile={async (payload) => {
           try {
-            await replaceFile(idFileReplace, file);
+            await replaceFileV2(selected.Id_file, payload);
+
             setAlertType("success");
             setMessage("Thay thế file thành công!");
             setOpen(true);
             setOpenModalReplace(false);
             fetchFiles();
           } catch (error) {
+            console.error("Lỗi replace:", error);
             setAlertType("error");
-            setMessage(error.message || "Thay thế file thất bại!");
+            setMessage(error?.message || "Thay thế file thất bại!");
             setOpen(true);
           }
         }}
@@ -209,7 +218,7 @@ export default function FilesPage() {
               <TableCell />
               <TableCell>STT</TableCell>
               <TableCell>Tiêu đề</TableCell>
-              <TableCell>Mô tả</TableCell>
+              <TableCell>Từ khóa</TableCell>
               <TableCell>Tổ chức</TableCell>
               <TableCell>Phòng ban</TableCell>
               <TableCell>Thư mục</TableCell>
@@ -226,7 +235,7 @@ export default function FilesPage() {
                 </TableCell>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>{file.TieuDe}</TableCell>
-                <TableCell>{file.MoTa}</TableCell>
+                <TableCell>{file.Tu_Khoa}</TableCell>
                 <TableCell>{file.SoBanNganh?.TenSoBanNganh}</TableCell>
                 <TableCell>{file.PhongBan?.TenPhongBan}</TableCell>
                 <TableCell>{file.Folder?.TenFolder}</TableCell>
@@ -259,7 +268,7 @@ export default function FilesPage() {
                     color="primary"
                     size="small"
                     onClick={() => {
-                      setIdFileReplace(file.Id_file);
+                      setSelected(file);
                       setOpenModalReplace(true);
                     }}
                   >
@@ -295,6 +304,7 @@ const UploadFileForm = ({
 }) => {
   const [tieuDe, setTieuDe] = useState("");
   const [moTa, setMoTa] = useState("");
+  const [tuKhoa, setTuKhoa] = useState("");
   const [file, setFile] = useState(null);
 
   const [selectedTochuc, setSelectedTochuc] = useState("");
@@ -333,6 +343,14 @@ const UploadFileForm = ({
             label="Mô tả"
             value={moTa}
             onChange={(e) => setMoTa(e.target.value)}
+            fullWidth
+            multiline
+            rows={3}
+          />
+          <TextField
+            label="Từ khóa"
+            value={tuKhoa}
+            onChange={(e) => setTuKhoa(e.target.value)}
             fullWidth
             multiline
             rows={3}
@@ -427,6 +445,7 @@ const UploadFileForm = ({
               file,
               tieuDe,
               moTa,
+              tuKhoa,
               selectedTochuc,
               selectedPhongban,
               selectedTopic,
@@ -458,8 +477,60 @@ const DeleteFileForm = ({ open, onClose, handleDeleteFile }) => (
 );
 
 /* ------------------- Replace Form ------------------- */
-const ReplaceFileForm = ({ open, onClose, handleReplaceFile }) => {
-  const [file, setFile] = useState(null);
+const ReplaceFileForm = ({
+  open,
+  onClose,
+  handleReplaceFile,
+  dataTochuc,
+  dataTopics,
+  currentFile,
+}) => {
+  const [file, setFile] = useState();
+  const [tieuDe, setTieuDe] = useState("");
+  const [moTa, setMoTa] = useState("");
+  const [tuKhoa, setTuKhoa] = useState("");
+
+  const [selectedTochuc, setSelectedTochuc] = useState("");
+  const [selectedPhongban, setSelectedPhongban] = useState("");
+  const [selectedFolder, setSelectedFolder] = useState("");
+  const [selectedTopic, setSelectedTopic] = useState("");
+
+  const [dataPhongban, setDataPhongban] = useState([]);
+  const [dataFolders, setDataFolders] = useState([]);
+
+  const loadPhongbans = async (idTochuc) => {
+    const data = await getListPhongBan(idTochuc);
+    setDataPhongban(data);
+  };
+
+  const loadFolders = async (idPhongban) => {
+    const data = await getFolderByPhongban(idPhongban);
+    setDataFolders(data);
+  };
+
+  // khi currentFile thay đổi → fill dữ liệu vào form
+  useEffect(() => {
+    if (currentFile) {
+      setTieuDe(currentFile.TieuDe || "");
+      setMoTa(currentFile.MoTa || "");
+      setTuKhoa(currentFile.Tu_Khoa);
+      setSelectedTochuc(currentFile.SoBanNganh?.Id_so_ban_nganh || "");
+      setSelectedPhongban(currentFile.PhongBan?.Id_phong_ban || "");
+      setSelectedFolder(currentFile.Folder?.Id_folder || "");
+      setSelectedTopic(currentFile.ChuDe?.Id_chu_de || "");
+
+      // load lại danh sách dependent
+      if (currentFile.SoBanNganh?.Id_so_ban_nganh) {
+        loadPhongbans(currentFile.SoBanNganh.Id_so_ban_nganh);
+      }
+      if (currentFile.PhongBan?.Id_phong_ban) {
+        loadFolders(currentFile.PhongBan.Id_phong_ban);
+      }
+
+      setFile(null); // reset file, chỉ chọn nếu người dùng muốn thay thế
+    }
+  }, [currentFile]);
+
   return (
     <CustomModal
       open={open}
@@ -468,7 +539,104 @@ const ReplaceFileForm = ({ open, onClose, handleReplaceFile }) => {
       title="Thay thế file"
       content={
         <Box display="flex" flexDirection="column" gap={2}>
-          <Typography>Chọn file mới để thay thế:</Typography>
+          <TextField
+            label="Tiêu đề"
+            value={tieuDe}
+            onChange={(e) => setTieuDe(e.target.value)}
+            fullWidth
+          />
+          <TextField
+            label="Mô tả"
+            value={moTa}
+            onChange={(e) => setMoTa(e.target.value)}
+            fullWidth
+            multiline
+            rows={3}
+          />
+
+          <TextField
+            label="Từ khóa"
+            value={tuKhoa}
+            onChange={(e) => setTuKhoa(e.target.value)}
+            fullWidth
+            multiline
+            rows={3}
+          />
+
+          {/* Tổ chức */}
+          <TextField
+            select
+            label="Tổ chức"
+            value={selectedTochuc}
+            onChange={(e) => {
+              const val = e.target.value;
+              setSelectedTochuc(val);
+              setSelectedPhongban("");
+              setSelectedFolder("");
+              loadPhongbans(val);
+            }}
+            fullWidth
+          >
+            {dataTochuc.map((tc) => (
+              <MenuItem key={tc.Id_so_ban_nganh} value={tc.Id_so_ban_nganh}>
+                {tc.TenSoBanNganh}
+              </MenuItem>
+            ))}
+          </TextField>
+
+          {/* Phòng ban */}
+          <TextField
+            select
+            label="Phòng ban"
+            value={selectedPhongban}
+            onChange={(e) => {
+              const val = e.target.value;
+              setSelectedPhongban(val);
+              setSelectedFolder("");
+              loadFolders(val);
+            }}
+            fullWidth
+            disabled={!selectedTochuc}
+          >
+            {dataPhongban.map((pb) => (
+              <MenuItem key={pb.Id_phong_ban} value={pb.Id_phong_ban}>
+                {pb.TenPhongBan}
+              </MenuItem>
+            ))}
+          </TextField>
+
+          {/* Thư mục */}
+          <TextField
+            select
+            label="Thư mục"
+            value={selectedFolder}
+            onChange={(e) => setSelectedFolder(e.target.value)}
+            fullWidth
+            disabled={!selectedPhongban}
+          >
+            {dataFolders.map((fd) => (
+              <MenuItem key={fd.Id_folder} value={fd.Id_folder}>
+                {fd.TenFolder}
+              </MenuItem>
+            ))}
+          </TextField>
+
+          {/* Lĩnh vực */}
+          <TextField
+            select
+            label="Lĩnh vực"
+            value={selectedTopic}
+            onChange={(e) => setSelectedTopic(e.target.value)}
+            fullWidth
+          >
+            {dataTopics.map((tp) => (
+              <MenuItem key={tp.Id_chu_de} value={tp.Id_chu_de}>
+                {tp.TenChuDe}
+              </MenuItem>
+            ))}
+          </TextField>
+
+          <Typography>Chọn file mới (nếu muốn thay thế):</Typography>
           <input type="file" onChange={(e) => setFile(e.target.files[0])} />
         </Box>
       }
@@ -476,10 +644,20 @@ const ReplaceFileForm = ({ open, onClose, handleReplaceFile }) => {
         <Button
           variant="contained"
           color="warning"
-          onClick={() => handleReplaceFile(file)}
-          disabled={!file}
+          onClick={() =>
+            handleReplaceFile({
+              tieuDe,
+              moTa,
+              tuKhoa,
+              id_so_ban_nganh: selectedTochuc,
+              id_phong_ban: selectedPhongban,
+              id_chu_de: selectedTopic,
+              id_folder: selectedFolder,
+              file,
+            })
+          }
         >
-          Thay thế
+          Lưu thay đổi
         </Button>
       }
     />

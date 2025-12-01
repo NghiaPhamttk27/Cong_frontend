@@ -28,9 +28,10 @@ export default function LoginPage() {
       // Lưu cookie phía client với js-cookie
       Cookies.set("token", data.access_token, { expires: 14 });
       Cookies.set("role", data.roles, { expires: 14 });
+      Cookies.set("id_so_ban_nganh", data.id_so_ban_nganh, { expires: 14 });
 
       // Điều hướng
-      if (data.roles === "Admin") {
+      if (data.roles === "Admin" || data.roles === "User") {
         alert("Đăng nhập thành công");
         router.push("/admin");
       } else {

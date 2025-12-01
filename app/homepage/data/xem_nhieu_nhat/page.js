@@ -15,7 +15,6 @@ const pageContainerStyle = {
   boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
   border: "1px solid #e0e0e0",
   padding: "20px",
-  marginTop: 120,
 };
 
 const headerStyle = {
@@ -102,56 +101,75 @@ export default function MostViewFullPage() {
   }, []);
 
   return (
-    <div style={pageContainerStyle}>
-      <div style={headerStyle}>
-        <h2 style={headerTitleStyle}>Danh sách file xem nhiều nhất</h2>
+    <>
+      <div
+        style={{ margin: "0px 10vw", marginTop: "100px", marginBottom: "40px" }}
+      >
+        <a
+          href="/homepage"
+          style={{
+            color: "green",
+            textDecoration: "none",
+            fontWeight: "500",
+            marginRight: 8,
+          }}
+        >
+          Trang chủ
+        </a>
+        <span style={{ margin: "0 8px", color: "#999" }}>{">"}</span>
+        <span style={{ fontWeight: "500" }}>Danh sách file xem nhiều nhất</span>
       </div>
+      <div style={pageContainerStyle}>
+        <div style={headerStyle}>
+          <h2 style={headerTitleStyle}>Danh sách file xem nhiều nhất</h2>
+        </div>
 
-      {loading && <p>Đang tải dữ liệu...</p>}
-      {!loading && data.length === 0 && <p>Không có dữ liệu</p>}
+        {loading && <p>Đang tải dữ liệu...</p>}
+        {!loading && data.length === 0 && <p>Không có dữ liệu</p>}
 
-      {data.map((item, index) => {
-        const itemSpecificStyle =
-          index === data.length - 1 ? lastChildStyle : {};
-        const formatStyle = {
-          ...itemFormatBaseStyle,
-          backgroundColor: formatColorsFileType(getFileType(item.FileUrl)),
-        };
+        {data.map((item, index) => {
+          const itemSpecificStyle =
+            index === data.length - 1 ? lastChildStyle : {};
+          const formatStyle = {
+            ...itemFormatBaseStyle,
+            backgroundColor: formatColorsFileType(getFileType(item.FileUrl)),
+          };
 
-        return (
-          <div key={index} style={{ ...dataItemStyle, ...itemSpecificStyle }}>
-            {/* Lĩnh vực */}
-            <Link
-              href={`/homepage/search?topic=${item.ChuDe?.Id_chu_de}`}
-              style={{ textDecoration: "none" }}
-            >
-              <p style={{ ...itemCategoryStyle, cursor: "pointer" }}>
-                {item.ChuDe?.TenChuDe}
-              </p>
-            </Link>
+          return (
+            <div key={index} style={{ ...dataItemStyle, ...itemSpecificStyle }}>
+              {/* Lĩnh vực */}
+              <Link
+                href={`/homepage/search?topic=${item.ChuDe?.Id_chu_de}`}
+                style={{ textDecoration: "none" }}
+              >
+                <p style={{ ...itemCategoryStyle, cursor: "pointer" }}>
+                  {item.ChuDe?.TenChuDe}
+                </p>
+              </Link>
 
-            {/* Tiêu đề */}
-            <Link
-              href={`/homepage/search?keyword=${encodeURIComponent(
-                item.TieuDe
-              )}`}
-              style={{ textDecoration: "none", color: "#2b2b2bff" }}
-            >
-              <h4 style={{ ...itemTitleStyle, cursor: "pointer" }}>
-                {item.TieuDe}
-              </h4>
-            </Link>
+              {/* Tiêu đề */}
+              <Link
+                href={`/homepage/search?keyword=${encodeURIComponent(
+                  item.TieuDe
+                )}`}
+                style={{ textDecoration: "none", color: "#2b2b2bff" }}
+              >
+                <h4 style={{ ...itemTitleStyle, cursor: "pointer" }}>
+                  {item.TieuDe}
+                </h4>
+              </Link>
 
-            <div style={itemMetaStyle}>
-              <span style={formatStyle}>{getFileType(item.FileUrl)}</span>
-              <span style={itemDateStyle}>
-                <span>🗓️</span>
-                {formatDate(item.NgayTao)}
-              </span>
+              <div style={itemMetaStyle}>
+                <span style={formatStyle}>{getFileType(item.FileUrl)}</span>
+                <span style={itemDateStyle}>
+                  <span>🗓️</span>
+                  {formatDate(item.NgayTao)}
+                </span>
+              </div>
             </div>
-          </div>
-        );
-      })}
-    </div>
+          );
+        })}
+      </div>
+    </>
   );
 }
