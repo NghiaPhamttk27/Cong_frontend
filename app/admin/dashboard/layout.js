@@ -42,7 +42,7 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
       }),
       marginLeft: 0,
     }),
-  })
+  }),
 );
 
 const AppBar = styled(MuiAppBar, {
@@ -90,7 +90,10 @@ export default function Layout({ children }) {
 
   const menuItems = [
     ...(role === "Admin"
-      ? [{ text: "Quản trị Lĩnh vực", link: "/admin/dashboard" }]
+      ? [
+          { text: "Quản trị Lĩnh vực", link: "/admin/dashboard" },
+          { text: "Quản trị Người dùng", link: "/admin/dashboard/users" },
+        ]
       : []),
     { text: "Quản trị Tổ chức", link: "/admin/dashboard/tochuc" },
     { text: "Quản trị File", link: "/admin/dashboard/file" },
