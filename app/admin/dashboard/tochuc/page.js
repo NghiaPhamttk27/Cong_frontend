@@ -138,7 +138,7 @@ export default function Tochuc() {
   // --- Checkbox ---
   const toggleRow = (id) => {
     setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
   const isSelected = (id) => selected.includes(id);
@@ -163,14 +163,16 @@ export default function Tochuc() {
   return (
     <Paper sx={{ padding: 2 }}>
       <div style={{ display: "flex", gap: 20 }}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={openCreateModal}
-          sx={{ marginBottom: 2 }}
-        >
-          Thêm Tổ Chức
-        </Button>
+        {role == "Admin" && (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={openCreateModal}
+            sx={{ marginBottom: 2 }}
+          >
+            Thêm Tổ Chức
+          </Button>
+        )}
 
         <Snackbar
           open={open}
@@ -243,13 +245,15 @@ export default function Tochuc() {
                   >
                     <EditIcon />
                   </IconButton>
-                  <IconButton
-                    color="error"
-                    size="small"
-                    onClick={() => openDeleteModal(tochuc.Id_so_ban_nganh)}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
+                  {role == "Admin" && (
+                    <IconButton
+                      color="error"
+                      size="small"
+                      onClick={() => openDeleteModal(tochuc.Id_so_ban_nganh)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  )}
                 </TableCell>
               </TableRow>
             ))}

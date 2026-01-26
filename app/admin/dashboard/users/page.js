@@ -22,6 +22,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import LockResetIcon from "@mui/icons-material/LockReset";
 import AddIcon from "@mui/icons-material/Add";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { InputAdornment } from "@mui/material";
 
 import CustomModal from "@/components/customModal";
 import {
@@ -41,6 +43,7 @@ export default function UsersPage() {
   const [openCreate, setOpenCreate] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
+  const [openReset, setOpenReset] = useState(false);
 
   const [selectedUser, setSelectedUser] = useState(null);
 
@@ -128,7 +131,7 @@ export default function UsersPage() {
         dataPhongban={dataPhongban}
         loadPhongban={setDataPhongban}
         onSubmit={async (payload) => {
-          await updateUser(selectedUser.Id_user, payload);
+          await updateUser(selectedUser.Id_User, payload);
           showAlert("success", "Cập nhật user thành công");
           setOpenEdit(false);
           fetchUsers();
@@ -147,13 +150,39 @@ export default function UsersPage() {
             color="error"
             variant="contained"
             onClick={async () => {
-              await deleteUser(selectedUser.Id_user);
+              await deleteUser(selectedUser.Id_User);
               showAlert("success", "Xóa user thành công");
               setOpenDelete(false);
               fetchUsers();
             }}
           >
             Xóa
+          </Button>
+        }
+      />
+
+      {/* Reset password */}
+      <CustomModal
+        open={openReset}
+        onClose={() => setOpenReset(false)}
+        type="warning"
+        title="Reset mật khẩu"
+        content={
+          <Typography>
+            Bạn có chắc muốn reset mật khẩu cho user này không?
+          </Typography>
+        }
+        footer={
+          <Button
+            color="warning"
+            variant="contained"
+            onClick={async () => {
+              await resetPassword(selectedUser.Id_User);
+              showAlert("success", "Reset mật khẩu thành công");
+              setOpenReset(false);
+            }}
+          >
+            Reset
           </Button>
         }
       />
@@ -165,22 +194,22 @@ export default function UsersPage() {
             <TableRow>
               <TableCell>STT</TableCell>
               <TableCell>Email</TableCell>
-              <TableCell>Username</TableCell>
+              <TableCell>TenDangNhap</TableCell>
               <TableCell>Role</TableCell>
               <TableCell>Tổ chức</TableCell>
-              <TableCell>Phòng ban</TableCell>
+              {/* <TableCell>Phòng ban</TableCell> */}
               <TableCell>Hành động</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {users.map((u, i) => (
-              <TableRow key={u.Id_user}>
+              <TableRow key={u.Id_User}>
                 <TableCell>{i + 1}</TableCell>
                 <TableCell>{u.Email}</TableCell>
-                <TableCell>{u.UserName}</TableCell>
-                <TableCell>{u.Role}</TableCell>
-                <TableCell>{u.SoBanNganh?.TenSoBanNganh}</TableCell>
-                <TableCell>{u.PhongBan?.TenPhongBan}</TableCell>
+                <TableCell>{u.TenDangNhap}</TableCell>
+                <TableCell>{u.Roles[0]}</TableCell>
+                <TableCell>{u.TenSoBanNganh}</TableCell>
+                {/* <TableCell>{u.TenPhongBan}</TableCell> */}
                 <TableCell>
                   <IconButton
                     color="primary"
@@ -194,9 +223,9 @@ export default function UsersPage() {
 
                   <IconButton
                     color="warning"
-                    onClick={async () => {
-                      await resetPassword(u.Id_user);
-                      showAlert("success", "Reset mật khẩu thành công");
+                    onClick={() => {
+                      setSelectedUser(u);
+                      setOpenReset(true);
                     }}
                   >
                     <LockResetIcon />
@@ -239,16 +268,60 @@ const UserForm = ({
   const [tochuc, setTochuc] = useState("");
   const [phongban, setPhongban] = useState("");
 
+  // thêm cho create
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   useEffect(() => {
     if (isEdit && user) {
       setEmail(user.Email);
-      setUsername(user.UserName);
-      setPhone(user.PhoneNumber);
-      setRole(user.Role);
-      setTochuc(user.SoBanNganh?.Id_so_ban_nganh || "");
-      setPhongban(user.PhongBan?.Id_phong_ban || "");
+      setUsername(user.TenDangNhap);
+      setPhone(user.SoDienThoai);
+      setRole(user.Roles[0]);
+      setTochuc(user.Id_so_ban_nganh || "");
+      setPhongban(user.Id_phong_ban || "");
+    } else {
+      // reset khi tạo mới
+      setPassword("");
+      setConfirmPassword("");
     }
-  }, [user]);
+  }, [user, isEdit]);
+
+  const handleSubmit = () => {
+    if (!isEdit) {
+      if (password !== confirmPassword) {
+        alert("Mật khẩu không khớp!");
+        return;
+      }
+
+      if (!/[^a-zA-Z0-9]/.test(password)) {
+        alert("Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt!");
+        return;
+      }
+
+      if (password.length < 8) {
+        alert("Mật khẩu phải có ít nhất 8 ký tự!");
+        return;
+      }
+    }
+
+    onSubmit({
+      Email: email,
+      Username: username,
+      PhoneNumber: phone,
+      Role: role,
+      Id_so_ban_nganh: tochuc,
+      Id_phong_ban: phongban,
+      ...(isEdit
+        ? {}
+        : {
+            Password: password,
+            ConfirmPassword: confirmPassword,
+          }),
+    });
+  };
 
   return (
     <CustomModal
@@ -263,26 +336,80 @@ const UserForm = ({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
+
           <TextField
-            label="Username"
+            label="Tên đăng nhập"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
+
           <TextField
             label="Số điện thoại"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
           />
 
-          <TextField
-            select
-            label="Role"
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-          >
-            <MenuItem value="Admin">Admin</MenuItem>
-            <MenuItem value="User">User</MenuItem>
-          </TextField>
+          {/* chỉ hiện role khi edit */}
+          {isEdit && (
+            <TextField
+              select
+              label="Role"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+            >
+              <MenuItem value="Admin">Admin</MenuItem>
+              <MenuItem value="User">User</MenuItem>
+            </TextField>
+          )}
+
+          {/* chỉ hiện password khi tạo */}
+          {!isEdit && (
+            <>
+              <TextField
+                label="Mật khẩu"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+
+              <TextField
+                label="Nhập lại mật khẩu"
+                type={showConfirmPassword ? "text" : "password"}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                        edge="end"
+                      >
+                        {showConfirmPassword ? (
+                          <VisibilityOff />
+                        ) : (
+                          <Visibility />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </>
+          )}
 
           <TextField
             select
@@ -299,35 +426,10 @@ const UserForm = ({
               </MenuItem>
             ))}
           </TextField>
-
-          <TextField
-            select
-            label="Phòng ban"
-            value={phongban}
-            onChange={(e) => setPhongban(e.target.value)}
-          >
-            {dataPhongban.map((pb) => (
-              <MenuItem key={pb.Id_phong_ban} value={pb.Id_phong_ban}>
-                {pb.TenPhongBan}
-              </MenuItem>
-            ))}
-          </TextField>
         </Box>
       }
       footer={
-        <Button
-          variant="contained"
-          onClick={() =>
-            onSubmit({
-              Email: email,
-              UserName: username,
-              PhoneNumber: phone,
-              Role: role,
-              Id_so_ban_nganh: tochuc,
-              Id_phong_ban: phongban,
-            })
-          }
-        >
+        <Button variant="contained" onClick={handleSubmit}>
           Lưu
         </Button>
       }

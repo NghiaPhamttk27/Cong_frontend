@@ -1,5 +1,5 @@
-"use client"; // <-- Thêm dòng này lên đầu file
-// Layout.js
+"use client";
+
 import * as React from "react";
 import { styled, useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -18,11 +18,15 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
 import { Button } from "@mui/material";
 import Link from "next/link";
 import Cookies from "js-cookie";
+
+// ICONS
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import PeopleIcon from "@mui/icons-material/People";
+import BusinessIcon from "@mui/icons-material/Business";
+import FolderIcon from "@mui/icons-material/Folder";
 
 const drawerWidth = 240;
 
@@ -79,29 +83,43 @@ export default function Layout({ children }) {
   const handleDrawerClose = () => setOpen(false);
 
   const handleLogout = () => {
-    // Xóa cookie
     Cookies.remove("token");
     Cookies.remove("role");
     Cookies.remove("id_so_ban_nganh");
-
-    // Điều hướng về trang homepage
-    window.location.href = "/admin/login"; // luôn an toàn
+    window.location.href = "/admin/login";
   };
 
   const menuItems = [
     ...(role === "Admin"
       ? [
-          { text: "Quản trị Lĩnh vực", link: "/admin/dashboard" },
-          { text: "Quản trị Người dùng", link: "/admin/dashboard/users" },
+          {
+            text: "Quản trị Lĩnh vực",
+            link: "/admin/dashboard",
+            icon: <DashboardIcon />,
+          },
+          {
+            text: "Quản trị Người dùng",
+            link: "/admin/dashboard/users",
+            icon: <PeopleIcon />,
+          },
         ]
       : []),
-    { text: "Quản trị Tổ chức", link: "/admin/dashboard/tochuc" },
-    { text: "Quản trị File", link: "/admin/dashboard/file" },
+    {
+      text: "Quản trị Tổ chức",
+      link: "/admin/dashboard/tochuc",
+      icon: <BusinessIcon />,
+    },
+    {
+      text: "Quản trị File",
+      link: "/admin/dashboard/file",
+      icon: <FolderIcon />,
+    },
   ];
 
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
+
       <AppBar position="fixed" open={open}>
         <Toolbar>
           <IconButton
@@ -123,7 +141,10 @@ export default function Layout({ children }) {
         sx={{
           width: drawerWidth,
           flexShrink: 0,
-          "& .MuiDrawer-paper": { width: drawerWidth, boxSizing: "border-box" },
+          "& .MuiDrawer-paper": {
+            width: drawerWidth,
+            boxSizing: "border-box",
+          },
         }}
         variant="persistent"
         anchor="left"
@@ -138,19 +159,20 @@ export default function Layout({ children }) {
             )}
           </IconButton>
         </DrawerHeader>
+
         <Divider />
+
         <List>
-          {menuItems.map((item, index) => (
+          {menuItems.map((item) => (
             <ListItem key={item.text} disablePadding>
               <ListItemButton component={Link} href={item.link}>
-                <ListItemIcon>
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
+                <ListItemIcon>{item.icon}</ListItemIcon>
                 <ListItemText primary={item.text} />
               </ListItemButton>
             </ListItem>
           ))}
         </List>
+
         <Button
           variant="contained"
           color="error"
@@ -163,7 +185,6 @@ export default function Layout({ children }) {
 
       <Main open={open}>
         <DrawerHeader />
-        {/* Nội dung trang sẽ được render ở đây */}
         {children}
       </Main>
     </Box>
